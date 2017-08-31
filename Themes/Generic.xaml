@@ -717,9 +717,9 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="controls:RFilterItem">
-                        <ContentPresenter Content="{Binding}">
-                            
-                        </ContentPresenter>
+                    <ContentPresenter Content="{Binding}">
+
+                    </ContentPresenter>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
