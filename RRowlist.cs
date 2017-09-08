@@ -36,6 +36,24 @@ namespace Ratio.UWP.Controls
             rowlist._rowlistWrapGrid.ItemHeight = (double)dependencyPropertyChangedEventArgs.NewValue;
         }
 
+        public static readonly DependencyProperty ScrollButtonWidthProperty = DependencyProperty.Register(
+            "ScrollButtonWidth", typeof(double), typeof(RRowlist), new PropertyMetadata(default(double)));
+
+        public double ScrollButtonWidth
+        {
+            get => (double) GetValue(ScrollButtonWidthProperty);
+            set => SetValue(ScrollButtonWidthProperty, value);
+        }
+
+        public static readonly DependencyProperty ScrollButtonHeightProperty = DependencyProperty.Register(
+            "ScrollButtonHeight", typeof(double), typeof(RRowlist), new PropertyMetadata(default(double)));
+
+        public double ScrollButtonHeight
+        {
+            get => (double) GetValue(ScrollButtonHeightProperty);
+            set => SetValue(ScrollButtonHeightProperty, value);
+        }
+
         public static readonly DependencyProperty LabelContainerHeightProperty = DependencyProperty.Register(
             "LabelContainerHeight", typeof(GridLength), typeof(RRowlist), new PropertyMetadata(new GridLength(60,GridUnitType.Pixel)));
 
