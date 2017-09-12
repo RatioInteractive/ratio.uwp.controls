@@ -341,6 +341,8 @@ namespace Ratio.UWP.Controls
             // Subscribe to events so that the left/right buttons can be shown or hidden accordingly. 
             PointerEntered += OnPointerEntered;
             PointerExited += OnPointerExited;
+            GotFocus += RCarousel_GotFocus;
+            LostFocus += RCarousel_LostFocus;
 
             UpdateFocusVisualSize();
         }
@@ -354,6 +356,16 @@ namespace Ratio.UWP.Controls
         }
 
         private void OnPointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            VisualStateManager.GoToState(this, "ButtonsHidden", true);
+        }
+
+        private void RCarousel_GotFocus(object sender, RoutedEventArgs e)
+        {
+            VisualStateManager.GoToState(this, "ButtonsShowing", true);
+        }
+
+        private void RCarousel_LostFocus(object sender, RoutedEventArgs e)
         {
             VisualStateManager.GoToState(this, "ButtonsHidden", true);
         }
@@ -487,7 +499,7 @@ namespace Ratio.UWP.Controls
 
         private void UpdateFocusVisualSize()
         {
-            if (_focusVisual != null)
+            if (_focusVisual != null && ItemsSource != null)
             {
                 _focusVisual.Width = ItemWidth;
                 _focusVisual.Height = ItemHeight;

@@ -242,7 +242,7 @@ namespace Ratio.UWP.Controls
         {
             if (_scrollViewer == null) return;
             if (steps == 0) return;
-
+            if(ItemsSource == null) return;
             // Ensure steps is in the range of -maxSteps to +maxStes
             int maxSteps = ItemsSource.Count - 1;
             steps = Math.Max(-maxSteps, Math.Min(maxSteps, steps));
@@ -514,6 +514,7 @@ namespace Ratio.UWP.Controls
                     AddItem(item);
                 }
             }
+            ResizeItems();
             ItemsPopulated?.Invoke(this, new EventArgs());
         }
 

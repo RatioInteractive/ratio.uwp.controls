@@ -37,7 +37,6 @@ namespace Ratio.UWP.Controls
                     continue;
                 }
                 return null;
-                break;
             }
         }
 
