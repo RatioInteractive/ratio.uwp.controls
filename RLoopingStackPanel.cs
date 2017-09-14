@@ -67,7 +67,7 @@ namespace Ratio.UWP.Controls
         }
 
         public static readonly DependencyProperty ItemHeightProperty = DependencyProperty.Register(
-            "ItemHeight", typeof(int), typeof(RLoopingStackPanel), new PropertyMetadata(400,ItemHeightChanged));
+            "ItemHeight", typeof(int), typeof(RLoopingStackPanel), new PropertyMetadata(default(int),ItemHeightChanged));
 
         public int ItemHeight
         {
@@ -76,10 +76,11 @@ namespace Ratio.UWP.Controls
         }
 
         public static readonly DependencyProperty ItemWidthProperty = DependencyProperty.Register(
-            "ItemWidth", typeof(double), typeof(RLoopingStackPanel), new PropertyMetadata(800, ItemWidthChanged));
+            "ItemWidth", typeof(double), typeof(RLoopingStackPanel), new PropertyMetadata(default(double), ItemWidthChanged));
 
         private static void ItemWidthChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
         {
+            Debug.WriteLine($"ItemWidthChanged: Old-{dependencyPropertyChangedEventArgs.OldValue} New- {dependencyPropertyChangedEventArgs.NewValue}");
             if ((double)dependencyPropertyChangedEventArgs.NewValue <= 0) return;
             var loopingStackPanel = dependencyObject as RLoopingStackPanel;
             loopingStackPanel?.CalculateActualItemSize();
@@ -89,6 +90,7 @@ namespace Ratio.UWP.Controls
 
         private static void ItemHeightChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
         {
+            Debug.WriteLine($"ItemHeightChanged: Old-{dependencyPropertyChangedEventArgs.OldValue} New- {dependencyPropertyChangedEventArgs.NewValue}");
             if ((int)dependencyPropertyChangedEventArgs.NewValue == 0) return;
             var loopingStackPanel = dependencyObject as RLoopingStackPanel;
             loopingStackPanel?.CalculateActualItemSize();
@@ -514,7 +516,9 @@ namespace Ratio.UWP.Controls
                     AddItem(item);
                 }
             }
+            CalculateActualItemSize();
             ResizeItems();
+            RecenterItems();
             ItemsPopulated?.Invoke(this, new EventArgs());
         }
 
@@ -584,18 +588,18 @@ namespace Ratio.UWP.Controls
 
         private void CalculateActualItemSize()
         {
-            if (ActualWidth <= 0)
-            {
-                // Either template has not been applied yet or control really occupies no width.
-                _actualItemWidth = 0;
-                _actualItemHeight = 0;
-            }
-            else if (ItemWidth > 1)
+//            if (ActualWidth <= 0)
+//            {
+//                // Either template has not been applied yet or control really occupies no width.
+//                _actualItemWidth = 0;
+//                _actualItemHeight = 0;
+//            }
+            if (ItemWidth > 1.0f)
             {
                 _actualItemWidth = (int) Math.Round(ItemWidth);
                 _actualItemHeight = ItemHeight;
             }
-            else
+            else if(ActualWidth > 0)
             {
                 // ItemWidth is to be treated as a relative value to the control's width.
                 _actualItemWidth = (int) Math.Round(ActualWidth * ItemWidth);
@@ -624,7 +628,7 @@ namespace Ratio.UWP.Controls
             IEnumerable<CarouselItem> focusedItemContainers = _stackPanel.Children
                 .Select(e => (CarouselItem)e)
                 .Where(e => e.Content == FocusedItem);
-            if (focusedItemContainers.Count() < 1) return;
+            if (!focusedItemContainers.Any()) return;
             // focusedItemContainers.Count() should be 3 with items added three times.  Pick the balanced, middle one.
             int middleIndex = (int)(focusedItemContainers.Count() / 2.0);
             CarouselItem centerItem = focusedItemContainers.ElementAt(middleIndex);
