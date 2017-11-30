@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Diagnostics;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography;
 using Windows.Foundation;
 using Windows.UI.Xaml;
@@ -63,7 +64,7 @@ namespace Ratio.UWP.Controls
             for (int i = 0; i < itemsControl.Items?.Count; i++)
             {
                 var container = itemsControl.ContainerFromIndex(i);
-
+                if(container == null) continue;
                 var rowlist = VisualTreeHelper.GetChild(container, 0) as RRowlist;
                 if (rowlist == null) continue;
                 rowlist.ItemTemplate = dataTemplate;
@@ -92,7 +93,7 @@ namespace Ratio.UWP.Controls
             for (int i = 0; i < itemsControl.Items?.Count; i++)
             {
                 var container = itemsControl.ContainerFromIndex(i);
-  
+                if(container == null) continue;
                 var rowlist = VisualTreeHelper.GetChild(container, 0) as RRowlist;
                 if (rowlist == null) continue;                
                 rowlist.ItemHeight = size.Height;
@@ -122,7 +123,7 @@ namespace Ratio.UWP.Controls
             for (int i = 0; i < itemsControl.Items?.Count; i++)
             {
                 var container = itemsControl.ContainerFromIndex(i);
-
+                if(container == null) continue;
                 var rowlist = VisualTreeHelper.GetChild(container, 0) as RRowlist;
                 if (rowlist == null) continue;
                 rowlist.ScrollButtonHeight = size.Height;
