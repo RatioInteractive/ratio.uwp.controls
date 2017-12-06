@@ -36,7 +36,7 @@ namespace Ratio.UWP.Controls
             for (int i = 0; i < itemsControl.Items?.Count; i++)
             {
                 var container = itemsControl.ContainerFromIndex(i);
-
+                if(container == null) continue;
                 var rowlist = VisualTreeHelper.GetChild(container, 0) as RRowlist;
                 if (rowlist == null) continue;
                 rowlist.ShiftSteps = steps;
