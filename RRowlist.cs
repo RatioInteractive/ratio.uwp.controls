@@ -1,7 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Linq;
+using System.Windows.Input;
 using Windows.Devices.Input;
+using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
 
 namespace Ratio.UWP.Controls
 {
@@ -137,6 +143,15 @@ namespace Ratio.UWP.Controls
         public static readonly DependencyProperty ShiftStepsProperty = DependencyProperty.Register(
             "ShiftSteps", typeof(int), typeof(RRowlist), new PropertyMetadata(1));
 
+        public static readonly DependencyProperty SelectedCommandNameProperty = DependencyProperty.Register(
+            "SelectedCommandName", typeof(string), typeof(RRowlist), new PropertyMetadata(default(string)));
+
+        public string SelectedCommandName
+        {
+            get => (string) GetValue(SelectedCommandNameProperty);
+            set => SetValue(SelectedCommandNameProperty, value);
+        }
+
         public int ShiftSteps
         {
             get => (int) GetValue(ShiftStepsProperty);
@@ -206,6 +221,32 @@ namespace Ratio.UWP.Controls
             GotFocus += RRowlist_GotFocus;
             LostFocus += RRowlist_LostFocus;
         }
+
+        protected override DependencyObject GetContainerForItemOverride()
+        {
+            return new RowlistItem();
+        }
+
+        protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
+        {
+            if (element is RowlistItem rowlistItem)
+            {
+                if (!string.IsNullOrEmpty(SelectedCommandName))
+                {
+                    var binding = new Binding
+                    {
+                        Path = new PropertyPath(SelectedCommandName),
+                        Source = item
+                    };
+                    rowlistItem.SetBinding(BaseItem.SelectedCommandProperty, binding);
+                }
+                rowlistItem.SourceItem = item;
+
+            }
+            base.PrepareContainerForItemOverride(element, item);
+        }
+
+
 
         #endregion
 

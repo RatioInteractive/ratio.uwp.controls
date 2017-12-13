@@ -1,13 +1,14 @@
 ﻿using System.Diagnostics;
+using System.Windows.Input;
+using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 
 namespace Ratio.UWP.Controls
 {
-    public sealed class CarouselItem : GridViewItem
+    public sealed class CarouselItem : BaseItem
     {
-        public object SourceItem { get; set; }
         public CarouselItem()
         {
             TabFocusNavigation = KeyboardNavigationMode.Once;

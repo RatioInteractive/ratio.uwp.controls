@@ -9,6 +9,7 @@ using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
 
 #pragma warning disable 169
 
@@ -167,6 +168,15 @@ namespace Ratio.UWP.Controls
         {
             get => (IList)GetValue(ItemsSourceProperty);
             set => SetValue(ItemsSourceProperty, value);
+        }
+
+        public static readonly DependencyProperty SelectedCommandNameProperty = DependencyProperty.Register(
+            "SelectedCommandName", typeof(string), typeof(RLoopingStackPanel), new PropertyMetadata(default(string)));
+
+        public string SelectedCommandName
+        {
+            get => (string) GetValue(SelectedCommandNameProperty);
+            set => SetValue(SelectedCommandNameProperty, value);
         }
 
         public double HorizontalOffset => _scrollViewer?.HorizontalOffset ?? 0;
@@ -671,8 +681,7 @@ namespace Ratio.UWP.Controls
 
         protected virtual void PrepareContainerForItem(ref UIElement element, object item)
         {
-            var carouselItem = element as CarouselItem;
-            if (carouselItem == null) return;
+            if (!(element is CarouselItem carouselItem)) return;
             carouselItem.Height = _actualItemHeight;
             carouselItem.Width = _actualItemWidth;
             if (ItemTemplate != null)
@@ -683,6 +692,15 @@ namespace Ratio.UWP.Controls
             {
                 
                 carouselItem.Style = CarouselItemContainerStyle;
+            }
+            if (!string.IsNullOrEmpty(SelectedCommandName))
+            {
+                var binding = new Binding
+                {
+                    Path = new PropertyPath(SelectedCommandName),
+                    Source = item
+                };
+                carouselItem.SetBinding(BaseItem.SelectedCommandProperty, binding);
             }
             carouselItem.Content = item;
             carouselItem.SourceItem = item;
