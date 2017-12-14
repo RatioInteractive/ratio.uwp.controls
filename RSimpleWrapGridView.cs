@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
-using Windows.UI.Notifications;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
 
 namespace Ratio.UWP.Controls
 {
@@ -106,11 +106,44 @@ namespace Ratio.UWP.Controls
             get => (bool) GetValue(SingleColumnProperty);
             set => SetValue(SingleColumnProperty, value);
         }
+
+        public static readonly DependencyProperty SelectedCommandNameProperty = DependencyProperty.Register(
+            "SelectedCommandName", typeof(string), typeof(RSimpleWrapGridView), new PropertyMetadata(default(string)));
+
+        public string SelectedCommandName
+        {
+            get => (string) GetValue(SelectedCommandNameProperty);
+            set => SetValue(SelectedCommandNameProperty, value);
+        }
         public RSimpleWrapGridView()
         {
             DefaultStyleKey = typeof(GridView);
             Loaded += SimpleGridViewOnLoaded;
             LayoutUpdated += OnLayoutUpdated;
+        }
+
+        protected override DependencyObject GetContainerForItemOverride()
+        {
+            return new SimpleWrapGridItem();
+        }
+
+        protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
+        {
+            if (element is SimpleWrapGridItem simpleWrapGridItem)
+            {
+                if (!string.IsNullOrEmpty(SelectedCommandName))
+                {
+                    var binding = new Binding
+                    {
+                        Path = new PropertyPath(SelectedCommandName),
+                        Source = item
+                    };
+                    simpleWrapGridItem.SetBinding(BaseItem.SelectedCommandProperty, binding);
+                }
+                simpleWrapGridItem.SourceItem = item;
+
+            }
+            base.PrepareContainerForItemOverride(element, item);
         }
 
         private static bool SetColumn(RSimpleWrapGridView simpleGridView, bool singleColumn = false)

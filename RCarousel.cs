@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Diagnostics;
+using System.Windows.Input;
 using Windows.Devices.Input;
 using Windows.System;
 using Windows.UI.Xaml;
@@ -227,6 +228,16 @@ namespace Ratio.UWP.Controls
             get => (int)GetValue(ShiftStepsProperty);
             set => SetValue(ShiftStepsProperty, value);
         }
+
+        public static readonly DependencyProperty SelectedCommandNameProperty = DependencyProperty.Register(
+            "SelectedCommandName", typeof(string), typeof(RCarousel), new PropertyMetadata(default(string)));
+
+        public string SelectedCommandName
+        {
+            get => (string) GetValue(SelectedCommandNameProperty);
+            set => SetValue(SelectedCommandNameProperty, value);
+        }
+
         #endregion
         #endregion
 
@@ -296,7 +307,6 @@ namespace Ratio.UWP.Controls
         }
 
         #region Overrides
-
         protected override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
@@ -401,15 +411,15 @@ namespace Ratio.UWP.Controls
                     e.Handled = true;
                     break;
 
-                case VirtualKey.Up:
-                case VirtualKey.Down:
-                case VirtualKey.PageUp:
-                case VirtualKey.PageDown:
-                case VirtualKey.Home:
-                case VirtualKey.End:
-                    // Don't let these keys bubble up and affect navigation on the page.
-                    e.Handled = true;
-                    break;
+//                case VirtualKey.Up:
+//                case VirtualKey.Down:
+//                case VirtualKey.PageUp:
+//                case VirtualKey.PageDown:
+//                case VirtualKey.Home:
+//                case VirtualKey.End:
+//                    // Don't let these keys bubble up and affect navigation on the page.
+//                    e.Handled = true;
+//                    break;
 
                 default:
                     base.OnKeyDown(e);

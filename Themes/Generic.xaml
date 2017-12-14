@@ -24,6 +24,26 @@
         </Setter>
     </Style>
 
+    <Style TargetType="controls:RowlistItem" >
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:RowlistItem">
+                    <ContentPresenter x:Name="contentPresenter"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="controls:SimpleWrapGridItem" >
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:SimpleWrapGridItem">
+                    <ContentPresenter x:Name="contentPresenter"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style TargetType="controls:RLoopingStackPanel" >
         <Setter Property="Template">
             <Setter.Value>
@@ -31,7 +51,7 @@
                     <ScrollViewer x:Name="scrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"
                         VerticalScrollMode="Disabled" IsVerticalScrollChainingEnabled="False" IsHorizontalScrollChainingEnabled="False"
                         HorizontalScrollMode="Auto" IsTabStop="False">
-                        <StackPanel x:Name="stackPanel"  AreScrollSnapPointsRegular="True" Orientation="{TemplateBinding Orientation}"/>
+                        <StackPanel x:Name="stackPanel"  AreScrollSnapPointsRegular="True" Orientation="{TemplateBinding Orientation}" TabFocusNavigation="Local"/>
                      </ScrollViewer>
                 </ControlTemplate>
             </Setter.Value>
@@ -264,7 +284,7 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <controls:RLoopingStackPanel x:Name="loopingStackPanel" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" ScrollViewer.VerticalScrollBarVisibility="Disabled" Orientation="Horizontal" ItemHeight="{TemplateBinding ItemHeight}" ItemWidth="{TemplateBinding ItemWidth}" ItemAspectRatio="{TemplateBinding ItemAspectRatio}" ItemTemplate="{TemplateBinding ItemTemplate}" ItemsSource="{TemplateBinding ItemsSource}" CarouselItemContainerStyle="{TemplateBinding ItemContainerStyle}" IsTabStop="False"/>
+                        <controls:RLoopingStackPanel x:Name="loopingStackPanel" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" ScrollViewer.VerticalScrollBarVisibility="Disabled" Orientation="Horizontal" ItemHeight="{TemplateBinding ItemHeight}" ItemWidth="{TemplateBinding ItemWidth}" ItemAspectRatio="{TemplateBinding ItemAspectRatio}" ItemTemplate="{TemplateBinding ItemTemplate}" ItemsSource="{TemplateBinding ItemsSource}" CarouselItemContainerStyle="{TemplateBinding ItemContainerStyle}" SelectedCommandName="{TemplateBinding SelectedCommandName}" IsTabStop="False"/>
                         <Border x:Name="focusVisual" Grid.Column="1" Grid.Row="0" BorderThickness="{TemplateBinding FocusVisualPrimaryThickness}" BorderBrush="{TemplateBinding FocusVisualPrimaryBrush}" IsHitTestVisible="False" Opacity="0"/>
                         <ContentPresenter x:Name="leftPresenter" Grid.Column="0" Grid.Row="0"/>
                         <ContentPresenter x:Name="rightPresenter" Grid.Column="2" Grid.Row="0"/>
@@ -725,3 +745,4 @@
         </Setter>
     </Style>
 </ResourceDictionary>
+
