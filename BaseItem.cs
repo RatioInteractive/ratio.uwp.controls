@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using System.Diagnostics;
+using System.Windows.Input;
 using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -33,6 +34,7 @@ namespace Ratio.UWP.Controls
 
         protected override void OnKeyUp(KeyRoutedEventArgs e)
         {
+            Debug.WriteLine($"Key captured by item control. Key: {e.OriginalKey}");
             if ((e.OriginalKey == VirtualKey.GamepadA || e.Key == VirtualKey.Space || e.Key == VirtualKey.Enter) && SelectedCommand != null)
             {
                 if (SelectedCommand.CanExecute(SourceItem))

@@ -1,4 +1,5 @@
 ﻿using System;
+using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -104,6 +105,20 @@ namespace Ratio.UWP.Controls
             _scrollViewer.ChangeView(0, _scrollViewer.VerticalOffset + delta, 1);
             pointerRoutedEventArgs.Handled = true;
         }
+
+        protected override void OnKeyUp(KeyRoutedEventArgs e)
+        {
+            if (e.OriginalKey == VirtualKey.GamepadLeftThumbstickUp)
+            {
+                ScrollToVerticalOffset(_scrollViewer.VerticalOffset - VerticalScrollStepSize);
+            }
+            else if (e.OriginalKey == VirtualKey.GamepadLeftThumbstickDown)
+            {
+                ScrollToVerticalOffset(_scrollViewer.VerticalOffset + VerticalScrollStepSize);
+            }
+            base.OnKeyUp(e);
+        }
+
         #endregion
 
         #region Support Methods

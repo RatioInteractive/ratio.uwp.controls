@@ -51,7 +51,7 @@
                     <ScrollViewer x:Name="scrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"
                         VerticalScrollMode="Disabled" IsVerticalScrollChainingEnabled="False" IsHorizontalScrollChainingEnabled="False"
                         HorizontalScrollMode="Auto" IsTabStop="False">
-                        <StackPanel x:Name="stackPanel"  AreScrollSnapPointsRegular="True" Orientation="{TemplateBinding Orientation}"/>
+                        <StackPanel x:Name="stackPanel"  AreScrollSnapPointsRegular="True" Orientation="{TemplateBinding Orientation}" TabFocusNavigation="Local"/>
                      </ScrollViewer>
                 </ControlTemplate>
             </Setter.Value>
