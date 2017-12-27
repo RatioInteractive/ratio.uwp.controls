@@ -51,6 +51,14 @@ namespace Ratio.UWP.Controls
             set => SetValue(VerticalScrollStepSizeProperty, value);
         }
 
+        public static readonly DependencyProperty DisableThumbstickScrollingProperty = DependencyProperty.Register(
+            "DisableThumbstickScrolling", typeof(bool), typeof(RVerticalScroller), new PropertyMetadata(default(bool)));
+
+        public bool DisableThumbstickScrolling
+        {
+            get => (bool) GetValue(DisableThumbstickScrollingProperty);
+            set => SetValue(DisableThumbstickScrollingProperty, value);
+        }
         #endregion
 
         public double? VerticalOffset => _scrollViewer?.VerticalOffset;
@@ -108,6 +116,11 @@ namespace Ratio.UWP.Controls
 
         protected override void OnKeyUp(KeyRoutedEventArgs e)
         {
+            if (DisableThumbstickScrolling)
+            {
+                base.OnKeyUp(e);
+                return;
+            }
             if (e.OriginalKey == VirtualKey.GamepadLeftThumbstickUp)
             {
                 ScrollToVerticalOffset(_scrollViewer.VerticalOffset - VerticalScrollStepSize);
