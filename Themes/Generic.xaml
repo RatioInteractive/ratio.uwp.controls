@@ -159,6 +159,7 @@
                     <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
                     <Setter Property="UseSystemFocusVisuals" Value="True" />
                     <Setter Property="FocusVisualMargin" Value="-3" />
+                    <Setter Property="FocusVisualPrimaryThickness" Value="5" />
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="Button">

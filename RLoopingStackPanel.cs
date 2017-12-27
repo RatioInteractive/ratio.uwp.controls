@@ -5,11 +5,14 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Windows.System;
+using Windows.System.Profile;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
 
 #pragma warning disable 169
 
@@ -42,6 +45,7 @@ namespace Ratio.UWP.Controls
         #endregion
 
         #region Properties
+
         #region Dependency Properties
         public static readonly DependencyProperty FocusedItemProperty = DependencyProperty.Register(
             "FocusedItem", typeof(object), typeof(RLoopingStackPanel), new PropertyMetadata(default(object), FocusedItemPropertyChanged));
@@ -353,6 +357,12 @@ namespace Ratio.UWP.Controls
 
             if (e.IsIntermediate) return;
             Debug.WriteLine("Last Offset: {0}, Current Offset: {1}", _lastOffset, _scrollViewer.HorizontalOffset);
+//            if (AnalyticsInfo.VersionInfo.DeviceFamily.ToUpper().Contains("XBOX") && _scrollFromXBoxNavigation)
+//            {
+//                _scrollFromXBoxNavigation = false;
+//                RecenterItems();
+//                return;
+//            }
             if (_loadInitiatedScroll)
             {
                 _loadInitiatedScroll = false;
@@ -367,7 +377,6 @@ namespace Ratio.UWP.Controls
                 _scrollInProgress = false;
                 return;
             }
-
             if (_scrollByJumpingToItem)
             {
                 // After we've avoided focused item changes during the jump, we now check the center item.
@@ -378,6 +387,15 @@ namespace Ratio.UWP.Controls
             {
                 // Rebalancing was not needed so scrolling has completed.
                 _scrollInProgress = false;
+            }
+            else
+            {
+                Debug.WriteLine("Reblance scroll succeeded.");
+            }
+            if (AnalyticsInfo.VersionInfo.DeviceFamily.ToUpper().Contains("XBOX") && _scrollFromXBoxNavigation)
+            {
+                _scrollFromXBoxNavigation = false;
+                RecenterItems();
             }
             OnScrollViewChanged(_scrollViewer);
         }
@@ -475,6 +493,18 @@ namespace Ratio.UWP.Controls
             Debug.WriteLine("Focus obtained by RLooping StackPanel");
             base.OnGotFocus(e);
         }
+
+        private bool _scrollFromXBoxNavigation;
+        protected override void OnKeyUp(KeyRoutedEventArgs e)
+        {
+            if (AnalyticsInfo.VersionInfo.DeviceFamily.ToUpper().Contains("XBOX"))
+            {
+                if(e.OriginalKey == VirtualKey.GamepadLeftThumbstickLeft || e.OriginalKey == VirtualKey.GamepadLeftThumbstickRight)
+                _scrollFromXBoxNavigation = true;
+            }
+            base.OnKeyUp(e);
+        }
+
         #endregion
 
         #region Supporting methods
@@ -633,6 +663,7 @@ namespace Ratio.UWP.Controls
 
         private void RecenterItems()
         {
+            Debug.WriteLine("Recenter items hit.");
             if (_stackPanel == null) return;
             if (_stackPanel.Children.Count == 0) return;
             IEnumerable<CarouselItem> focusedItemContainers = _stackPanel.Children
@@ -645,6 +676,7 @@ namespace Ratio.UWP.Controls
             int centerItemIndex = _stackPanel.Children.IndexOf(centerItem);
             _lastOffset = FullItemWidth * centerItemIndex - (int)((ActualWidth - FullItemWidth) / 2);
             _scrollViewer.ChangeView(_lastOffset, 0, 1, true);
+            Debug.WriteLine("Srollview changed from RecenterItems.");
         }
 
         protected virtual void OnScrollViewChanged(ScrollViewer e)

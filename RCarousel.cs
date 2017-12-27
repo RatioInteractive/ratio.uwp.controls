@@ -36,6 +36,11 @@ namespace Ratio.UWP.Controls
         private bool _isAutoRotationInitialized;
         private bool _isNavigatedByKeyboard;
         private bool _showFocusVisualOnResizeCompleted;
+        private Storyboard _focusVisualEntrance;
+        private Storyboard _focusVisualExit;
+
+        private Storyboard FocusVisualEntrance => _focusVisualEntrance ?? (_focusVisualEntrance = _rootGrid.Resources["FocusVisualEntrance"] as Storyboard);
+        private Storyboard FocusVisualExit => _focusVisualExit ?? (_focusVisualExit = _rootGrid.Resources["FocusVisualExit"] as Storyboard);
 
         #region Dependency Properties
 
@@ -238,6 +243,23 @@ namespace Ratio.UWP.Controls
             set => SetValue(SelectedCommandNameProperty, value);
         }
 
+        public static readonly DependencyProperty DisplayMarkersProperty = DependencyProperty.Register(
+            "DisplayMarkers", typeof(bool), typeof(RCarousel), new PropertyMetadata(true));
+
+        public bool DisplayMarkers
+        {
+            get => (bool) GetValue(DisplayMarkersProperty);
+            set => SetValue(DisplayMarkersProperty, value);
+        }
+
+        public static readonly DependencyProperty DisplayScrollButtonsProperty = DependencyProperty.Register(
+            "DisplayScrollButtons", typeof(bool), typeof(RCarousel), new PropertyMetadata(default(bool)));
+
+        public bool DisplayScrollButtons
+        {
+            get => (bool) GetValue(DisplayScrollButtonsProperty);
+            set => SetValue(DisplayScrollButtonsProperty, value);
+        }
         #endregion
         #endregion
 
@@ -334,18 +356,35 @@ namespace Ratio.UWP.Controls
             }
             if (_leftButton != null)
             {
-                _leftButton.Click += LeftButtonOnClick;
+                if (DisplayScrollButtons)
+                {
+                    _leftButton.Click += LeftButtonOnClick;
+                }
                 _leftButton.Visibility = Visibility.Collapsed;
             }
 
             if (_rightButton != null)
             {
-                _rightButton.Click += RightButtonOnClick;
+                if (DisplayScrollButtons)
+                {
+                    _rightButton.Click += RightButtonOnClick;
+                }
+                else
+                {
+                    _rightButton.Visibility = Visibility.Collapsed;
+                }
             }
 
             if (_positionMarkers != null)
             {
-                _positionMarkers.OnMarkerClicked += PositionMarkersOnMarkerClicked;
+                if (DisplayMarkers)
+                {
+                    _positionMarkers.OnMarkerClicked += PositionMarkersOnMarkerClicked;
+                }
+                else
+                {
+                    _positionMarkers.Visibility = Visibility.Collapsed;
+                }
             }
 
             // Subscribe to events so that the left/right buttons can be shown or hidden accordingly. 
@@ -397,6 +436,13 @@ namespace Ratio.UWP.Controls
 
         protected override void OnKeyDown(KeyRoutedEventArgs e)
         {
+            if (e.OriginalKey == VirtualKey.GamepadLeftThumbstickLeft || e.OriginalKey == VirtualKey.GamepadLeftThumbstickRight || e.OriginalKey == VirtualKey.GamepadLeftThumbstickUp || e.OriginalKey == VirtualKey.GamepadLeftThumbstickDown)
+            {
+                _isNavigatedByKeyboard = true;
+                e.Handled = e.OriginalKey == VirtualKey.GamepadLeftThumbstickLeft || e.OriginalKey == VirtualKey.GamepadLeftThumbstickRight ;
+                base.OnKeyDown(e);
+                return;
+            }
             switch (e.Key)
             {
                 case VirtualKey.Left:
@@ -437,7 +483,8 @@ namespace Ratio.UWP.Controls
 
         private void LoopingStackPanelOnFocusedItemChanged(object sender, EventArgs e)
         {
-            _positionMarkers.SelectedItem = _loopingStackPanel.FocusedItem;
+            if(DisplayMarkers)
+                _positionMarkers.SelectedItem = _loopingStackPanel.FocusedItem;
             // For all the reasons that caused the focus item to change, reset the auto-rotation so a full period is
             // waited before the next change.
             ResetAutoRotationTimer();
@@ -466,8 +513,11 @@ namespace Ratio.UWP.Controls
 
         private void LoopingStackPanelOnScrollViewChanged(object sender, ScrollViewer scrollViewer)
         {
-            _leftButton.Visibility = scrollViewer.HorizontalOffset < 1 ? Visibility.Collapsed : Visibility.Visible;
-            _rightButton.Visibility = scrollViewer.HorizontalOffset > (scrollViewer.ExtentWidth - scrollViewer.ViewportWidth - 2) ? Visibility.Collapsed : Visibility.Visible;
+            if (DisplayScrollButtons)
+            {
+                _leftButton.Visibility = scrollViewer.HorizontalOffset < 1 ? Visibility.Collapsed : Visibility.Visible;
+                _rightButton.Visibility = scrollViewer.HorizontalOffset > (scrollViewer.ExtentWidth - scrollViewer.ViewportWidth - 2) ? Visibility.Collapsed : Visibility.Visible;
+            }
 
             // At the end of a scroll, show the focus visual if not shown already (it may have been hidden by a direct
             // manipulation) and the scroll was triggered by keyboard navigation.
@@ -504,35 +554,46 @@ namespace Ratio.UWP.Controls
 
         private void PositionMarkersOnMarkerClicked(object sender, object clickedItem)
         {
-            _loopingStackPanel.JumpToItem(clickedItem);
+            if (DisplayScrollButtons)
+                _loopingStackPanel.JumpToItem(clickedItem);
         }
 
         private void UpdateFocusVisualSize()
         {
             if (_focusVisual != null && ItemsSource != null)
             {
-                _focusVisual.Width = ItemWidth;
-                _focusVisual.Height = ItemHeight;
+                var carouselItem = FocusedItem as CarouselItem;
+                var horzOffset = 0.0;
+                var vertOffset = 0.0;
+                if (carouselItem != null)
+                {
+                    horzOffset = carouselItem.Margin.Left + carouselItem.Margin.Right + carouselItem.Padding.Left + carouselItem.Padding.Right;
+                    vertOffset = carouselItem.Margin.Top + carouselItem.Margin.Bottom + carouselItem.Padding.Top + carouselItem.Padding.Bottom;
+                }
+                _focusVisual.Width = ItemWidth - horzOffset;
+                _focusVisual.Height = ItemHeight - vertOffset;
                 if (ItemsSource.Count > 0) _focusVisual.Margin = _loopingStackPanel.GetItemContainerMargin();
             }
         }
 
         private void ShowFocusVisual()
         {
+            Debug.WriteLine("Show Focus border attempted.");
+            FocusVisualExit.SkipToFill();
             if (_focusVisual != null && (int)Math.Round(_focusVisual.Opacity) == 0)
             {
-                Storyboard focusVisualEntrance = _rootGrid.Resources["FocusVisualEntrance"] as Storyboard;
-                focusVisualEntrance?.Begin();
+                FocusVisualEntrance.Begin();
                 DisableAutoRotation();
             }
         }
 
         private void HideFocusVisual()
         {
+            Debug.WriteLine("Hide Focus border attempted.");
+            FocusVisualEntrance.SkipToFill();
             if (_focusVisual != null && _focusVisual.Opacity > 0)
             {
-                Storyboard focusVisualExit = _rootGrid.Resources["FocusVisualExit"] as Storyboard;
-                focusVisualExit?.Begin();
+                FocusVisualExit.Begin();
                 if (AutoRotationEnabled) UpdateAutoRotationConfiguration();
             }
         }
