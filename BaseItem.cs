@@ -34,7 +34,7 @@ namespace Ratio.UWP.Controls
 
         protected override void OnKeyUp(KeyRoutedEventArgs e)
         {
-            Debug.WriteLine($"Key captured by item control. Key: {e.OriginalKey}");
+//            Debug.WriteLine($"Key captured by item control. Key: {e.OriginalKey}");
             if ((e.OriginalKey == VirtualKey.GamepadA || e.Key == VirtualKey.Space || e.Key == VirtualKey.Enter) && SelectedCommand != null)
             {
                 if (SelectedCommand.CanExecute(SourceItem))

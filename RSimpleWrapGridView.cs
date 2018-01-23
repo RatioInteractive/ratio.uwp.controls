@@ -161,14 +161,14 @@ namespace Ratio.UWP.Controls
                 simpleGridView.ClearValue(ItemHeightProperty);
                 simpleGridView._itemsWrapGrid.ClearValue(ItemsWrapGrid.ItemWidthProperty);                
                 simpleGridView._itemsWrapGrid.ClearValue(ItemsWrapGrid.ItemHeightProperty);
-                Debug.WriteLine("COL: Simple grid: ItemHeight: {0}, ItemWidth: {1}, Panel ItemHeight: {2}, ItemWidth: {3}",simpleGridView.ItemHeight,simpleGridView.ItemWidth,simpleGridView._itemsWrapGrid.ItemHeight,simpleGridView._itemsWrapGrid.ItemWidth);
+//                Debug.WriteLine("COL: Simple grid: ItemHeight: {0}, ItemWidth: {1}, Panel ItemHeight: {2}, ItemWidth: {3}",simpleGridView.ItemHeight,simpleGridView.ItemWidth,simpleGridView._itemsWrapGrid.ItemHeight,simpleGridView._itemsWrapGrid.ItemWidth);
             }
             else
             {
                 simpleGridView._itemsWrapGrid.ClearValue(ItemsWrapGrid.MaximumRowsOrColumnsProperty);
                 simpleGridView._itemsWrapGrid.ItemHeight = simpleGridView.ItemHeight;
                 simpleGridView._itemsWrapGrid.ItemWidth = simpleGridView.ItemWidth;
-                Debug.WriteLine("SIZE: Simple grid: ItemHeight: {0}, ItemWidth: {1}, Panel ItemHeight: {2}, ItemWidth: {3}", simpleGridView.ItemHeight, simpleGridView.ItemWidth, simpleGridView._itemsWrapGrid.ItemHeight, simpleGridView._itemsWrapGrid.ItemWidth);
+//                Debug.WriteLine("SIZE: Simple grid: ItemHeight: {0}, ItemWidth: {1}, Panel ItemHeight: {2}, ItemWidth: {3}", simpleGridView.ItemHeight, simpleGridView.ItemWidth, simpleGridView._itemsWrapGrid.ItemHeight, simpleGridView._itemsWrapGrid.ItemWidth);
             }
             return true;
         }

@@ -25,11 +25,6 @@ namespace Ratio.UWP.Controls
             OnItemsLoaded();
             SizeChanged -= OnSizeChanged;
         }
-        protected override void OnGotFocus(RoutedEventArgs e)
-        {
-            Debug.WriteLine($"Focus obtained by Wrap Grid");
-            base.OnGotFocus(e);
-        }
 
         private void OnItemsLoaded()
         {
