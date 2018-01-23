@@ -357,12 +357,6 @@ namespace Ratio.UWP.Controls
 
             if (e.IsIntermediate) return;
             Debug.WriteLine("Last Offset: {0}, Current Offset: {1}", _lastOffset, _scrollViewer.HorizontalOffset);
-//            if (AnalyticsInfo.VersionInfo.DeviceFamily.ToUpper().Contains("XBOX") && _scrollFromXBoxNavigation)
-//            {
-//                _scrollFromXBoxNavigation = false;
-//                RecenterItems();
-//                return;
-//            }
             if (_loadInitiatedScroll)
             {
                 _loadInitiatedScroll = false;
@@ -403,7 +397,7 @@ namespace Ratio.UWP.Controls
         private void RLoopingStackPanel_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             // Only respond to width changes because actions below will trigger a height change that should be ignored.
-            if (e.PreviousSize.Width == e.NewSize.Width) return;
+            if (Math.Abs(e.PreviousSize.Width - e.NewSize.Width) < 1.0) return;
 
             double lastActualItemWidth = _actualItemWidth;
             CalculateActualItemSize();
@@ -418,7 +412,7 @@ namespace Ratio.UWP.Controls
                 }
 
                 // This will only be true if ItemWidth is relative (not fixed).
-                if (_actualItemWidth != lastActualItemWidth)
+                if (Math.Abs(_actualItemWidth - lastActualItemWidth) > 1.0)
                 {
                     ResizeItems();
                 }
@@ -430,7 +424,7 @@ namespace Ratio.UWP.Controls
                 {
                     _recenterAfterResizingTimer = new DispatcherTimer();
                     _recenterAfterResizingTimer.Interval = TimeSpan.FromMilliseconds(100);
-                    _recenterAfterResizingTimer.Tick += _recenterAfterResizingTimer_Tick; ;
+                    _recenterAfterResizingTimer.Tick += _recenterAfterResizingTimer_Tick;
                 }
                 if (_recenterAfterResizingTimer.IsEnabled) _recenterAfterResizingTimer.Stop();
                 _recenterAfterResizingTimer.Start();
@@ -450,7 +444,7 @@ namespace Ratio.UWP.Controls
         private async void _recenterAfterResizingTimer_Tick(object sender, object e)
         {
             _recenterAfterResizingTimer.Stop();
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => RecenterItems());
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, RecenterItems);
         }
 
         private async void _resizingCompletedTimer_Tick(object sender, object e)
@@ -614,7 +608,11 @@ namespace Ratio.UWP.Controls
             if(_scrollViewer == null) return false;
             int offsetForBalancedScrollView = (int) Math.Round((_scrollViewer.ExtentWidth - _scrollViewer.ActualWidth) / 2);
             var delta = offsetForBalancedScrollView - _scrollViewer.HorizontalOffset;
-            if (!(Math.Abs(delta) > FullItemWidth)) return false;
+            if (!(Math.Abs(delta) >= FullItemWidth))
+            {
+                if (Math.Abs(delta) > 1.0) _scrollViewer.ChangeView(offsetForBalancedScrollView, 0, 1, true);
+                return false;
+            }
             var steps = (int) Math.Round((decimal) (delta / FullItemWidth), 0, MidpointRounding.AwayFromZero);
             //invert to shift in the opposite direction of the scroll
             var invertedStep = steps * -1;
@@ -669,12 +667,14 @@ namespace Ratio.UWP.Controls
             IEnumerable<CarouselItem> focusedItemContainers = _stackPanel.Children
                 .Select(e => (CarouselItem)e)
                 .Where(e => e.Content == FocusedItem);
-            if (!focusedItemContainers.Any()) return;
+            var itemContainers = focusedItemContainers.ToList();
+            if (!itemContainers.Any()) return;
             // focusedItemContainers.Count() should be 3 with items added three times.  Pick the balanced, middle one.
-            int middleIndex = (int)(focusedItemContainers.Count() / 2.0);
-            CarouselItem centerItem = focusedItemContainers.ElementAt(middleIndex);
+            int middleIndex = (int)(itemContainers.Count() / 2.0);
+            CarouselItem centerItem = itemContainers.ElementAt(middleIndex);
             int centerItemIndex = _stackPanel.Children.IndexOf(centerItem);
-            _lastOffset = FullItemWidth * centerItemIndex - (int)((ActualWidth - FullItemWidth) / 2);
+//            _lastOffset = FullItemWidth * centerItemIndex - (int)((ActualWidth - FullItemWidth) / 2);
+            _lastOffset = FullItemWidth * centerItemIndex - (FullItemWidth - ItemWidth);
             _scrollViewer.ChangeView(_lastOffset, 0, 1, true);
             Debug.WriteLine("Srollview changed from RecenterItems.");
         }
@@ -748,7 +748,12 @@ namespace Ratio.UWP.Controls
             //Invert steps to scroll in the opposite direction of steps taken to cancel out wrap.
             _scrollToNegateCollectionWrapMove = true;
             var invertedSteps = -1 * steps;
-            _lastOffset = _scrollViewer.HorizontalOffset + FullItemWidth * invertedSteps;
+            var currentSteps = (int)Math.Round(_scrollViewer.HorizontalOffset / FullItemWidth,MidpointRounding.AwayFromZero);
+            Debug.WriteLine($"ShiftScrollViewToNegateCollectionWrapMove currentSteps: {currentSteps}");
+            var marginOffset = FullItemWidth - ItemWidth;
+            var totalSteps = currentSteps + invertedSteps;
+            _lastOffset = (FullItemWidth * totalSteps) - marginOffset;
+            Debug.WriteLine($"ShiftScrollViewToNegateCollectionWrapMove _lastOffset: {_lastOffset}");
             _scrollViewer.ChangeView(_lastOffset, 0, 1, true);
         }
         #endregion

@@ -390,8 +390,8 @@ namespace Ratio.UWP.Controls
             // Subscribe to events so that the left/right buttons can be shown or hidden accordingly. 
             PointerEntered += OnPointerEntered;
             PointerExited += OnPointerExited;
-            GotFocus += RCarousel_GotFocus;
-            LostFocus += RCarousel_LostFocus;
+//            GotFocus += RCarousel_GotFocus;
+//            LostFocus += RCarousel_LostFocus;
 
             UpdateFocusVisualSize();
         }
@@ -409,19 +409,20 @@ namespace Ratio.UWP.Controls
             VisualStateManager.GoToState(this, "ButtonsHidden", true);
         }
 
-        private void RCarousel_GotFocus(object sender, RoutedEventArgs e)
-        {
-            VisualStateManager.GoToState(this, "ButtonsShowing", true);
-        }
-
-        private void RCarousel_LostFocus(object sender, RoutedEventArgs e)
-        {
-            VisualStateManager.GoToState(this, "ButtonsHidden", true);
-        }
+//        private void RCarousel_GotFocus(object sender, RoutedEventArgs e)
+//        {
+//            VisualStateManager.GoToState(this, "ButtonsShowing", true);
+//        }
+//
+//        private void RCarousel_LostFocus(object sender, RoutedEventArgs e)
+//        {
+//            VisualStateManager.GoToState(this, "ButtonsHidden", true);
+//        }
 
         protected override void OnGotFocus(RoutedEventArgs e)
         {
             Debug.WriteLine($"Focus obtained by RCarousel");
+            DisableAutoRotation();
             base.OnGotFocus(e);
             VisualStateManager.GoToState(this, "ButtonsShowing", true);
             ShowFocusVisual();
@@ -439,7 +440,7 @@ namespace Ratio.UWP.Controls
             if (e.OriginalKey == VirtualKey.GamepadLeftThumbstickLeft || e.OriginalKey == VirtualKey.GamepadLeftThumbstickRight || e.OriginalKey == VirtualKey.GamepadLeftThumbstickUp || e.OriginalKey == VirtualKey.GamepadLeftThumbstickDown)
             {
                 _isNavigatedByKeyboard = true;
-                e.Handled = e.OriginalKey == VirtualKey.GamepadLeftThumbstickLeft || e.OriginalKey == VirtualKey.GamepadLeftThumbstickRight ;
+                e.Handled = e.OriginalKey == VirtualKey.GamepadLeftThumbstickLeft || e.OriginalKey == VirtualKey.GamepadLeftThumbstickRight;
                 base.OnKeyDown(e);
                 return;
             }
@@ -572,13 +573,12 @@ namespace Ratio.UWP.Controls
                 }
                 _focusVisual.Width = ItemWidth - horzOffset;
                 _focusVisual.Height = ItemHeight - vertOffset;
-                if (ItemsSource.Count > 0) _focusVisual.Margin = _loopingStackPanel.GetItemContainerMargin();
+//                if (ItemsSource.Count > 0) _focusVisual.Margin = _loopingStackPanel.GetItemContainerMargin();
             }
         }
 
         private void ShowFocusVisual()
         {
-            Debug.WriteLine("Show Focus border attempted.");
             FocusVisualExit.SkipToFill();
             if (_focusVisual != null && (int)Math.Round(_focusVisual.Opacity) == 0)
             {
