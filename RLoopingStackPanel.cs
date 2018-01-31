@@ -474,6 +474,7 @@ namespace Ratio.UWP.Controls
             }
             if (_scrollViewer != null)
             {
+                _scrollViewer.BringIntoViewOnFocusChange = false;
                 _scrollViewer.HorizontalSnapPointsAlignment = SnapPointsAlignment.Center;
                 _scrollViewer.HorizontalSnapPointsType = SnapPointsType.Mandatory;
                 _scrollViewer.Loaded += (sender, args) => WireUp();
@@ -481,6 +482,7 @@ namespace Ratio.UWP.Controls
             }
             SizeChanged += RLoopingStackPanel_SizeChanged;
         }
+
 
         protected override void OnGotFocus(RoutedEventArgs e)
         {
@@ -606,11 +608,11 @@ namespace Ratio.UWP.Controls
         private bool RebalanceScrollView()
         {
             if(_scrollViewer == null) return false;
-            int offsetForBalancedScrollView = (int) Math.Round((_scrollViewer.ExtentWidth - _scrollViewer.ActualWidth) / 2);
-            var delta = offsetForBalancedScrollView - _scrollViewer.HorizontalOffset;
+            int offsetForBalancedScrollView = ((int)_scrollViewer.ExtentWidth - (int)_scrollViewer.ActualWidth) / 2;
+            var delta = offsetForBalancedScrollView - (int)_scrollViewer.HorizontalOffset;
             if (!(Math.Abs(delta) >= FullItemWidth))
             {
-                if (Math.Abs(delta) > 1.0) _scrollViewer.ChangeView(offsetForBalancedScrollView, 0, 1, true);
+//                if (delta > 1.0) _scrollViewer.ChangeView(offsetForBalancedScrollView, 0, 1, true);
                 return false;
             }
             var steps = (int) Math.Round((decimal) (delta / FullItemWidth), 0, MidpointRounding.AwayFromZero);
@@ -736,6 +738,13 @@ namespace Ratio.UWP.Controls
             }
             carouselItem.Content = item;
             carouselItem.SourceItem = item;
+            carouselItem.GettingFocus += (sender, args) =>
+            {
+                if (!(args.OldFocusedElement is CarouselItem && args.NewFocusedElement is CarouselItem ci)) return;
+                args.Handled = true;
+                JumpToItem(ci.Content);
+            };
+            carouselItem.GotFocus += (sender, args) => Debug.WriteLine($"Carousel item got focus. {carouselItem.Content}");
         }
 
         private bool _scrollToNegateCollectionWrapMove;

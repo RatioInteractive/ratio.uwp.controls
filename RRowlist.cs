@@ -291,6 +291,7 @@ namespace Ratio.UWP.Controls
         private void RRowlist_GotFocus(object sender, RoutedEventArgs e)
         {
             VisualStateManager.GoToState(this, "ButtonsShowing", true);
+            StartBringIntoView(new BringIntoViewOptions() {AnimationDesired = true});
         }
 
         private void RRowlist_LostFocus(object sender, RoutedEventArgs e)
