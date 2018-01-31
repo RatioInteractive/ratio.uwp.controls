@@ -100,6 +100,7 @@ namespace Ratio.UWP.Controls
         {
             base.OnApplyTemplate();
             _scrollViewer = GetTemplateChild("ScrollViewer") as ScrollViewer;
+            if (_scrollViewer != null) _scrollViewer.BringIntoViewOnFocusChange = true;
         }
 
         #endregion

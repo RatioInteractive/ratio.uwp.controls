@@ -421,11 +421,12 @@ namespace Ratio.UWP.Controls
 
         protected override void OnGotFocus(RoutedEventArgs e)
         {
-            Debug.WriteLine($"Focus obtained by RCarousel");
+            Debug.WriteLine($"Focus obtained by RCarousel.");
             DisableAutoRotation();
             base.OnGotFocus(e);
             VisualStateManager.GoToState(this, "ButtonsShowing", true);
             ShowFocusVisual();
+            StartBringIntoView(new BringIntoViewOptions() {AnimationDesired = true});
         }
 
         protected override void OnLostFocus(RoutedEventArgs e)
@@ -441,6 +442,7 @@ namespace Ratio.UWP.Controls
             {
                 _isNavigatedByKeyboard = true;
                 e.Handled = e.OriginalKey == VirtualKey.GamepadLeftThumbstickLeft || e.OriginalKey == VirtualKey.GamepadLeftThumbstickRight;
+                DisableAutoRotation();
                 base.OnKeyDown(e);
                 return;
             }
