@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Diagnostics;
-using System.Windows.Input;
 using Windows.Devices.Input;
 using Windows.System;
 using Windows.UI.Xaml;
@@ -10,8 +9,6 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Animation;
 
 #pragma warning disable 169
-
-// The Templated Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234235
 
 namespace Ratio.UWP.Controls
 {
@@ -23,7 +20,7 @@ namespace Ratio.UWP.Controls
     [TemplatePart(Name = "positionMarkers", Type = typeof(RPositionMarkers))]
     public sealed class RCarousel : Control
     {
-        #region Properties
+        #region Fields
         private RCarouselSaveState _pendingStateRestoration;
         private Grid _rootGrid;
         private RLoopingStackPanel _loopingStackPanel;
@@ -32,18 +29,19 @@ namespace Ratio.UWP.Controls
         private ScrollViewer _carouselScrollViewer;
         private Button _leftButton;
         private Button _rightButton;
-        private DispatcherTimer _timer = new DispatcherTimer();
+        private readonly DispatcherTimer _timer = new DispatcherTimer();
         private bool _isAutoRotationInitialized;
         private bool _isNavigatedByKeyboard;
         private bool _showFocusVisualOnResizeCompleted;
         private Storyboard _focusVisualEntrance;
         private Storyboard _focusVisualExit;
+        #endregion
 
+        #region Properties
         private Storyboard FocusVisualEntrance => _focusVisualEntrance ?? (_focusVisualEntrance = _rootGrid.Resources["FocusVisualEntrance"] as Storyboard);
         private Storyboard FocusVisualExit => _focusVisualExit ?? (_focusVisualExit = _rootGrid.Resources["FocusVisualExit"] as Storyboard);
 
         #region Dependency Properties
-
         public static readonly DependencyProperty AutoRotationEnabledProperty = DependencyProperty.Register(
             "AutoRotationEnabled", typeof(bool), typeof(RCarousel), new PropertyMetadata(default(bool)));
 
@@ -264,6 +262,12 @@ namespace Ratio.UWP.Controls
         #endregion
 
         #region Public Methods
+        public RCarousel()
+        {
+            TabFocusNavigation = KeyboardNavigationMode.Once;
+            DefaultStyleKey = typeof(RCarousel);
+        }
+
         public RCarouselSaveState SaveState()
         {
             return new RCarouselSaveState(_loopingStackPanel.SaveState());
@@ -285,48 +289,6 @@ namespace Ratio.UWP.Controls
 
         }
         #endregion
-
-
-        public RCarousel()
-        {
-            TabFocusNavigation = KeyboardNavigationMode.Once;
-            DefaultStyleKey = typeof(RCarousel);
-        }
-
-        private void InitializeAutoRotation()
-        {
-            _timer.Tick += AutoRotation_Tick;
-            _timer.Interval = new System.TimeSpan(0, 0, AutoRotationIntervalSeconds);
-            if (AutoRotationEnabled) _timer.Start();
-            _isAutoRotationInitialized = true;
-        }
-
-        private void DisableAutoRotation()
-        {
-            if (_timer.IsEnabled) _timer.Stop();
-            _timer.Tick -= AutoRotation_Tick;
-            _isAutoRotationInitialized = false;
-        }
-
-        private void UpdateAutoRotationConfiguration()
-        {
-            if (_isAutoRotationInitialized) DisableAutoRotation();
-            InitializeAutoRotation();
-        }
-
-        private void ResetAutoRotationTimer()
-        {
-            if (_isAutoRotationInitialized)
-            {
-                if (_timer.IsEnabled) _timer.Stop();
-                if (AutoRotationEnabled) _timer.Start();
-            }
-        }
-
-        private void AutoRotation_Tick(object sender, object e)
-        {
-            _loopingStackPanel?.AutoScrollBySteps(ShiftSteps);
-        }
 
         #region Overrides
         protected override void OnApplyTemplate()
@@ -393,31 +355,7 @@ namespace Ratio.UWP.Controls
 
             UpdateFocusVisualSize();
         }
-
-        private void OnPointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-            if (e.GetCurrentPoint(null).PointerDevice.PointerDeviceType == PointerDeviceType.Mouse)
-            {
-                VisualStateManager.GoToState(this, "ButtonsShowing", true);
-            }
-        }
-
-        private void OnPointerExited(object sender, PointerRoutedEventArgs e)
-        {
-            VisualStateManager.GoToState(this, "ButtonsHidden", true);
-        }
-
-//        private void RCarousel_GotFocus(object sender, RoutedEventArgs e)
-//        {
-//            VisualStateManager.GoToState(this, "ButtonsShowing", true);
-//        }
-//
-//        private void RCarousel_LostFocus(object sender, RoutedEventArgs e)
-//        {
-//            VisualStateManager.GoToState(this, "ButtonsHidden", true);
-//        }
-
-        
+ 
         protected override void OnGotFocus(RoutedEventArgs e)
         {
             Debug.WriteLine($"Focus obtained by RCarousel.");
@@ -437,38 +375,35 @@ namespace Ratio.UWP.Controls
 
         protected override void OnKeyDown(KeyRoutedEventArgs e)
         {
-            if (e.OriginalKey == VirtualKey.GamepadLeftThumbstickLeft || e.OriginalKey == VirtualKey.GamepadLeftThumbstickRight || e.OriginalKey == VirtualKey.GamepadLeftThumbstickUp || e.OriginalKey == VirtualKey.GamepadLeftThumbstickDown)
-            {
-                _isNavigatedByKeyboard = true;
-                e.Handled = e.OriginalKey == VirtualKey.GamepadLeftThumbstickLeft || e.OriginalKey == VirtualKey.GamepadLeftThumbstickRight;
-                DisableAutoRotation();
-                base.OnKeyDown(e);
-                return;
-            }
             switch (e.Key)
             {
                 case VirtualKey.Left:
                     _isNavigatedByKeyboard = true;
                     ScrollLeft();
+                    DisableAutoRotation();
                     e.Handled = true;
                     break;
 
                 case VirtualKey.Right:
                     _isNavigatedByKeyboard = true;
+                    DisableAutoRotation();
                     ScrollRight();
                     e.Handled = true;
                     break;
-
-//                case VirtualKey.Up:
-//                case VirtualKey.Down:
-//                case VirtualKey.PageUp:
-//                case VirtualKey.PageDown:
-//                case VirtualKey.Home:
-//                case VirtualKey.End:
-//                    // Don't let these keys bubble up and affect navigation on the page.
-//                    e.Handled = true;
-//                    break;
-
+                case VirtualKey.Up:
+                    if (XYFocusUp != null && XYFocusUp is Control control1)
+                    {
+                        control1.Focus(FocusState.Keyboard);
+                        e.Handled = true; 
+                    }
+                    break;
+                case VirtualKey.Down:
+                    if (XYFocusDown != null && XYFocusDown is Control control2)
+                    {
+                        control2.Focus(FocusState.Keyboard);
+                        e.Handled = true;
+                    }
+                    break;
                 default:
                     base.OnKeyDown(e);
                     break;
@@ -477,7 +412,19 @@ namespace Ratio.UWP.Controls
 
         #endregion
 
-        #region Support Methods
+        #region Event Handlers
+        private void OnPointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            if (e.GetCurrentPoint(null).PointerDevice.PointerDeviceType == PointerDeviceType.Mouse)
+            {
+                VisualStateManager.GoToState(this, "ButtonsShowing", true);
+            }
+        }
+
+        private void OnPointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            VisualStateManager.GoToState(this, "ButtonsHidden", true);
+        }
         private void LoopingStackPanelOnDirectManipulationStarted(object sender, EventArgs e)
         {
             HideFocusVisual();
@@ -491,7 +438,6 @@ namespace Ratio.UWP.Controls
             // waited before the next change.
             ResetAutoRotationTimer();
         }
-
         private void LoopingStackPanelOnItemsPopulated(object sender, EventArgs e)
         {
             // When there are actual items, it's now possible to fully determine the focus visual's size (namely margin).
@@ -536,29 +482,33 @@ namespace Ratio.UWP.Controls
             HideFocusVisual();
             ScrollLeft();
         }
+        private void PositionMarkersOnMarkerClicked(object sender, object clickedItem)
+        {
+            if (DisplayScrollButtons)
+                _loopingStackPanel.JumpToItem(clickedItem);
+        }
+        private void AutoRotation_Tick(object sender, object e)
+        {
+            _loopingStackPanel?.AutoScrollBySteps(ShiftSteps);
+        }
+        private void RightButtonOnClick(object sender, RoutedEventArgs e)
+        {
+            HideFocusVisual();
+            ScrollRight();
+        }
+        #endregion
 
+        #region Support Methods
         private void ScrollLeft()
         {
             if (double.IsNaN(ItemWidth)) return;
             _loopingStackPanel.ScrollBySteps(-1 * ShiftSteps);
         }
 
-        private void RightButtonOnClick(object sender, RoutedEventArgs e)
-        {
-            HideFocusVisual();
-            ScrollRight();
-        }
-
         private void ScrollRight()
         {
             if (double.IsNaN(ItemWidth)) return;
             _loopingStackPanel.ScrollBySteps(ShiftSteps);
-        }
-
-        private void PositionMarkersOnMarkerClicked(object sender, object clickedItem)
-        {
-            if (DisplayScrollButtons)
-                _loopingStackPanel.JumpToItem(clickedItem);
         }
 
         private void UpdateFocusVisualSize()
@@ -575,7 +525,6 @@ namespace Ratio.UWP.Controls
                 }
                 _focusVisual.Width = ItemWidth - horzOffset;
                 _focusVisual.Height = ItemHeight - vertOffset;
-//                if (ItemsSource.Count > 0) _focusVisual.Margin = _loopingStackPanel.GetItemContainerMargin();
             }
         }
 
@@ -597,6 +546,36 @@ namespace Ratio.UWP.Controls
             {
                 FocusVisualExit.Begin();
                 if (AutoRotationEnabled) UpdateAutoRotationConfiguration();
+            }
+        }
+
+        private void InitializeAutoRotation()
+        {
+            _timer.Tick += AutoRotation_Tick;
+            _timer.Interval = new TimeSpan(0, 0, AutoRotationIntervalSeconds);
+            if (AutoRotationEnabled) _timer.Start();
+            _isAutoRotationInitialized = true;
+        }
+
+        private void DisableAutoRotation()
+        {
+            if (_timer.IsEnabled) _timer.Stop();
+            _timer.Tick -= AutoRotation_Tick;
+            _isAutoRotationInitialized = false;
+        }
+
+        private void UpdateAutoRotationConfiguration()
+        {
+            if (_isAutoRotationInitialized) DisableAutoRotation();
+            InitializeAutoRotation();
+        }
+
+        private void ResetAutoRotationTimer()
+        {
+            if (_isAutoRotationInitialized)
+            {
+                if (_timer.IsEnabled) _timer.Stop();
+                if (AutoRotationEnabled) _timer.Start();
             }
         }
         #endregion
