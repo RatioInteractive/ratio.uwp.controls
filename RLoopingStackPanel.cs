@@ -242,7 +242,7 @@ namespace Ratio.UWP.Controls
             ScrollBySteps(steps);
         }
 
-        public void ScrollBySteps(int steps, [CallerMemberName] string callingMethod = "")
+        public void ScrollBySteps(int steps,bool animate = true ,[CallerMemberName] string callingMethod = "")
         {
             if (_scrollViewer == null) return;
             if (steps == 0) return;
@@ -255,7 +255,7 @@ namespace Ratio.UWP.Controls
             // guaranteed to be found to either side of the centered item.  With that, just scroll there.
             _scrollInProgress = true;
             _lastOffset = _scrollViewer.HorizontalOffset + (FullItemWidth * steps);
-            _scrollViewer.ChangeView(_lastOffset, 0, 1, false);
+            _scrollViewer.ChangeView(_lastOffset, 0, 1, !animate);
         }
 
         public RLoopingStackPanelSaveState SaveState()
@@ -753,7 +753,17 @@ namespace Ratio.UWP.Controls
                 //With bring into view on focus disabled we are handling that function ourselves due to the need to rebalance the scroll viewer.
                 if (!(args.OldFocusedElement is CarouselItem && args.NewFocusedElement is CarouselItem ci)) return;
                 args.Handled = true;
-                JumpToItem(ci.Content);
+                switch (args.Direction)
+                {
+                    case FocusNavigationDirection.Left:
+                    case FocusNavigationDirection.Previous:
+                        ScrollBySteps(-1);
+                        break;
+                    case FocusNavigationDirection.Right:
+                    case FocusNavigationDirection.Next:
+                        ScrollBySteps(1);
+                        break;
+                }
             };
             carouselItem.GotFocus += (sender, args) => Debug.WriteLine($"Carousel item got focus. {carouselItem.Content}");
         }
