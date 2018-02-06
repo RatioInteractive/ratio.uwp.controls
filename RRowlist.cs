@@ -1,7 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Linq;
+using System.Windows.Input;
 using Windows.Devices.Input;
+using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
 
 namespace Ratio.UWP.Controls
 {
@@ -34,6 +40,24 @@ namespace Ratio.UWP.Controls
             var rowlist = dependencyObject as RRowlist;
             if (rowlist?._rowlistWrapGrid == null) return;
             rowlist._rowlistWrapGrid.ItemHeight = (double)dependencyPropertyChangedEventArgs.NewValue;
+        }
+
+        public static readonly DependencyProperty ScrollButtonWidthProperty = DependencyProperty.Register(
+            "ScrollButtonWidth", typeof(double), typeof(RRowlist), new PropertyMetadata(default(double)));
+
+        public double ScrollButtonWidth
+        {
+            get => (double) GetValue(ScrollButtonWidthProperty);
+            set => SetValue(ScrollButtonWidthProperty, value);
+        }
+
+        public static readonly DependencyProperty ScrollButtonHeightProperty = DependencyProperty.Register(
+            "ScrollButtonHeight", typeof(double), typeof(RRowlist), new PropertyMetadata(default(double)));
+
+        public double ScrollButtonHeight
+        {
+            get => (double) GetValue(ScrollButtonHeightProperty);
+            set => SetValue(ScrollButtonHeightProperty, value);
         }
 
         public static readonly DependencyProperty LabelContainerHeightProperty = DependencyProperty.Register(
@@ -119,6 +143,15 @@ namespace Ratio.UWP.Controls
         public static readonly DependencyProperty ShiftStepsProperty = DependencyProperty.Register(
             "ShiftSteps", typeof(int), typeof(RRowlist), new PropertyMetadata(1));
 
+        public static readonly DependencyProperty SelectedCommandNameProperty = DependencyProperty.Register(
+            "SelectedCommandName", typeof(string), typeof(RRowlist), new PropertyMetadata(default(string)));
+
+        public string SelectedCommandName
+        {
+            get => (string) GetValue(SelectedCommandNameProperty);
+            set => SetValue(SelectedCommandNameProperty, value);
+        }
+
         public int ShiftSteps
         {
             get => (int) GetValue(ShiftStepsProperty);
@@ -189,6 +222,32 @@ namespace Ratio.UWP.Controls
             LostFocus += RRowlist_LostFocus;
         }
 
+        protected override DependencyObject GetContainerForItemOverride()
+        {
+            return new RowlistItem();
+        }
+
+        protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
+        {
+            if (element is RowlistItem rowlistItem)
+            {
+                if (!string.IsNullOrEmpty(SelectedCommandName))
+                {
+                    var binding = new Binding
+                    {
+                        Path = new PropertyPath(SelectedCommandName),
+                        Source = item
+                    };
+                    rowlistItem.SetBinding(BaseItem.SelectedCommandProperty, binding);
+                }
+                rowlistItem.SourceItem = item;
+
+            }
+            base.PrepareContainerForItemOverride(element, item);
+        }
+
+
+
         #endregion
 
         #region Event Handlers
@@ -232,6 +291,7 @@ namespace Ratio.UWP.Controls
         private void RRowlist_GotFocus(object sender, RoutedEventArgs e)
         {
             VisualStateManager.GoToState(this, "ButtonsShowing", true);
+            StartBringIntoView(new BringIntoViewOptions() {AnimationDesired = true});
         }
 
         private void RRowlist_LostFocus(object sender, RoutedEventArgs e)

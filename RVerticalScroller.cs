@@ -1,4 +1,5 @@
 ﻿using System;
+using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -50,6 +51,14 @@ namespace Ratio.UWP.Controls
             set => SetValue(VerticalScrollStepSizeProperty, value);
         }
 
+        public static readonly DependencyProperty DisableThumbstickScrollingProperty = DependencyProperty.Register(
+            "DisableThumbstickScrolling", typeof(bool), typeof(RVerticalScroller), new PropertyMetadata(default(bool)));
+
+        public bool DisableThumbstickScrolling
+        {
+            get => (bool) GetValue(DisableThumbstickScrollingProperty);
+            set => SetValue(DisableThumbstickScrollingProperty, value);
+        }
         #endregion
 
         public double? VerticalOffset => _scrollViewer?.VerticalOffset;
@@ -91,6 +100,7 @@ namespace Ratio.UWP.Controls
         {
             base.OnApplyTemplate();
             _scrollViewer = GetTemplateChild("ScrollViewer") as ScrollViewer;
+            if (_scrollViewer != null) _scrollViewer.BringIntoViewOnFocusChange = true;
         }
 
         #endregion
@@ -104,6 +114,25 @@ namespace Ratio.UWP.Controls
             _scrollViewer.ChangeView(0, _scrollViewer.VerticalOffset + delta, 1);
             pointerRoutedEventArgs.Handled = true;
         }
+
+        protected override void OnKeyUp(KeyRoutedEventArgs e)
+        {
+            if (DisableThumbstickScrolling)
+            {
+                base.OnKeyUp(e);
+                return;
+            }
+            if (e.OriginalKey == VirtualKey.GamepadLeftThumbstickUp)
+            {
+                ScrollToVerticalOffset(_scrollViewer.VerticalOffset - VerticalScrollStepSize);
+            }
+            else if (e.OriginalKey == VirtualKey.GamepadLeftThumbstickDown)
+            {
+                ScrollToVerticalOffset(_scrollViewer.VerticalOffset + VerticalScrollStepSize);
+            }
+            base.OnKeyUp(e);
+        }
+
         #endregion
 
         #region Support Methods

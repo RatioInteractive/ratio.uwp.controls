@@ -100,12 +100,6 @@ namespace Ratio.UWP.Controls
             }
         }
 
-        protected override void OnGotFocus(RoutedEventArgs e)
-        {
-            Debug.WriteLine($"Focus obtained by Wrap Grid selector");
-            base.OnGotFocus(e);
-        }
-
         #endregion
 
         #region Support Methods
