@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -110,6 +111,7 @@ namespace Ratio.UWP.Controls
         public static readonly DependencyProperty SelectedCommandNameProperty = DependencyProperty.Register(
             "SelectedCommandName", typeof(string), typeof(RSimpleWrapGridView), new PropertyMetadata(default(string)));
 
+
         public string SelectedCommandName
         {
             get => (string) GetValue(SelectedCommandNameProperty);
@@ -120,6 +122,14 @@ namespace Ratio.UWP.Controls
             DefaultStyleKey = typeof(GridView);
             Loaded += SimpleGridViewOnLoaded;
             LayoutUpdated += OnLayoutUpdated;
+            Unloaded += OnUnloaded;
+        }
+
+        private void OnUnloaded(object sender, RoutedEventArgs routedEventArgs)
+        {
+            Loaded -= SimpleGridViewOnLoaded;
+            Unloaded -= OnUnloaded;
+            _itemsWrapGrid = null;
         }
 
         protected override DependencyObject GetContainerForItemOverride()
@@ -138,6 +148,7 @@ namespace Ratio.UWP.Controls
                         Path = new PropertyPath(SelectedCommandName),
                         Source = item
                     };
+                    simpleWrapGridItem.ItemBinding = binding;
                     simpleWrapGridItem.SetBinding(BaseItem.SelectedCommandProperty, binding);
                 }
                 simpleWrapGridItem.SourceItem = item;

@@ -1,14 +1,16 @@
-﻿using System.Diagnostics;
+﻿using System;
 using System.Windows.Input;
 using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 
 namespace Ratio.UWP.Controls
 {
     public class BaseItem :GridViewItem
     {
+        public Binding ItemBinding { get; set; }
         public static readonly DependencyProperty SelectedCommandProperty = DependencyProperty.Register(
             "SelectedCommand", typeof(ICommand), typeof(BaseItem), new PropertyMetadata(default(ICommand)));
 
@@ -18,6 +20,20 @@ namespace Ratio.UWP.Controls
             set => SetValue(SelectedCommandProperty, value);
         }
         public object SourceItem { get; set; }
+
+        public BaseItem()
+        {
+            Unloaded += (sender, args) =>
+            {
+
+                if (ItemBinding.Source is IDisposable itemDisposable) itemDisposable.Dispose();
+                ItemBinding = null;
+                if (SourceItem is IDisposable disposableSourceItem) disposableSourceItem.Dispose();
+                SourceItem = null;
+                if (DataContext is IDisposable disposable) disposable.Dispose();
+                DataContext = null;
+            };
+        }
 
         protected override void OnTapped(TappedRoutedEventArgs e)
         {
