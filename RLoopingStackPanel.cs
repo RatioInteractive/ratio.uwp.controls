@@ -198,13 +198,40 @@ namespace Ratio.UWP.Controls
         public int ChildrenCount => _stackPanel?.Children.Count ?? 0;
         #endregion
 
-
-
         #region Public methods
         public RLoopingStackPanel()
         {
             DefaultStyleKey = typeof(RLoopingStackPanel);            
             Loaded += (sender, args) => LayoutUpdated += OnLayoutUpdated;
+            Unloaded += OnUnloaded;
+        }
+
+        private void OnUnloaded(object o, RoutedEventArgs routedEventArgs)
+        {
+            if (ItemsSource is INotifyCollectionChanged notifyCollection)
+            {
+                notifyCollection.CollectionChanged -= NotifyCollectionOnCollectionChanged;
+            }
+            _recenterAfterResizingTimer.Tick -= _recenterAfterResizingTimer_Tick;
+            _resizingCompletedTimer.Tick -= _resizingCompletedTimer_Tick;
+            _recenterAfterResizingTimer = null;
+            _resizingCompletedTimer = null;
+            SizeChanged -= RLoopingStackPanel_SizeChanged;
+            Unloaded -= OnUnloaded;
+            if (_stackPanel != null && _stackPanel.Children.Count > 0)
+            {
+                _stackPanel.Children.Clear();
+                _stackPanel = null;
+            }
+            if(ItemsSource != null)
+            {
+                foreach (var item in ItemsSource)
+                {
+                    if (item is IDisposable disposable) disposable.Dispose();
+                }
+                ItemsSource = null;
+            }
+            DataContext = null;
         }
 
         public void JumpToItem(object targetItem, [CallerMemberName] string callingMethod = "")
