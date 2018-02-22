@@ -208,12 +208,13 @@ namespace Ratio.UWP.Controls
 
         private void OnUnloaded(object o, RoutedEventArgs routedEventArgs)
         {
+
             if (ItemsSource is INotifyCollectionChanged notifyCollection)
             {
                 notifyCollection.CollectionChanged -= NotifyCollectionOnCollectionChanged;
             }
-            _recenterAfterResizingTimer.Tick -= _recenterAfterResizingTimer_Tick;
-            _resizingCompletedTimer.Tick -= _resizingCompletedTimer_Tick;
+            if(_recenterAfterResizingTimer != null) _recenterAfterResizingTimer.Tick -= _recenterAfterResizingTimer_Tick;
+            if(_resizingCompletedTimer != null) _resizingCompletedTimer.Tick -= _resizingCompletedTimer_Tick;
             _recenterAfterResizingTimer = null;
             _resizingCompletedTimer = null;
             SizeChanged -= RLoopingStackPanel_SizeChanged;
