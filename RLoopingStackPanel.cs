@@ -616,18 +616,14 @@ namespace Ratio.UWP.Controls
         {
             if (_stackPanel == null) return;
             if (_stackPanel.Children.Count <= 0) return;
-            var last = _stackPanel.Children.Last();
-            _stackPanel.Children.Remove(last);
-            _stackPanel.Children.Insert(0, last);
+            _stackPanel.Children.Move((uint)_stackPanel.Children.Count - 1,0);
         }
 
         private void ShiftTowardsBeginning()
         {
             if (_stackPanel == null) return;
             if (_stackPanel.Children.Count <= 0) return;
-            var first = _stackPanel.Children.First();
-            _stackPanel.Children.Remove(first);
-            _stackPanel.Children.Add(first);
+            _stackPanel.Children.Move(0, (uint)_stackPanel.Children.Count - 1);
         }
 
         /// <returns>true if rebalancing is needed, false otherwise.</returns>

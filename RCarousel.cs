@@ -271,6 +271,7 @@ namespace Ratio.UWP.Controls
 
         private void OnUnloaded(object sender, RoutedEventArgs routedEventArgs)
         {
+            Unloaded -= OnUnloaded;
             PointerEntered -= OnPointerEntered;
             PointerExited -= OnPointerExited;
             _loopingStackPanel.DirectManipulationStarted -= LoopingStackPanelOnDirectManipulationStarted;
@@ -282,8 +283,11 @@ namespace Ratio.UWP.Controls
             _leftButton.Click -= LeftButtonOnClick;
             _rightButton.Click -= RightButtonOnClick;
             _positionMarkers.OnMarkerClicked -= PositionMarkersOnMarkerClicked;
-            _timer.Tick -= AutoRotation_Tick;
-            _timer = null;
+            if(_timer != null)
+            {
+                _timer.Tick -= AutoRotation_Tick;
+                _timer = null;
+            }
         }
 
         public RCarouselSaveState SaveState()
