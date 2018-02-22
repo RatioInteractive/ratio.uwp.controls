@@ -263,10 +263,6 @@ namespace Ratio.UWP.Controls
             GotFocus -= RRowlist_GotFocus;
             LostFocus -= RRowlist_LostFocus;
             Unwire();
-            if (DataContext is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
             ItemsSource = null;
             DataContext = null;
         }

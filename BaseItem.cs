@@ -21,20 +21,6 @@ namespace Ratio.UWP.Controls
         }
         public object SourceItem { get; set; }
 
-        public BaseItem()
-        {
-            Unloaded += (sender, args) =>
-            {
-
-                if (ItemBinding.Source is IDisposable itemDisposable) itemDisposable.Dispose();
-                ItemBinding = null;
-                if (SourceItem is IDisposable disposableSourceItem) disposableSourceItem.Dispose();
-                SourceItem = null;
-                if (DataContext is IDisposable disposable) disposable.Dispose();
-                DataContext = null;
-            };
-        }
-
         protected override void OnTapped(TappedRoutedEventArgs e)
         {
             if (SelectedCommand != null)
