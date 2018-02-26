@@ -29,7 +29,7 @@ namespace Ratio.UWP.Controls
         private ScrollViewer _carouselScrollViewer;
         private Button _leftButton;
         private Button _rightButton;
-        private readonly DispatcherTimer _timer = new DispatcherTimer();
+        private DispatcherTimer _timer = new DispatcherTimer();
         private bool _isAutoRotationInitialized;
         private bool _isNavigatedByKeyboard;
         private bool _showFocusVisualOnResizeCompleted;
@@ -266,6 +266,28 @@ namespace Ratio.UWP.Controls
         {
             TabFocusNavigation = KeyboardNavigationMode.Once;
             DefaultStyleKey = typeof(RCarousel);
+            Unloaded += OnUnloaded;
+        }
+
+        private void OnUnloaded(object sender, RoutedEventArgs routedEventArgs)
+        {
+            Unloaded -= OnUnloaded;
+            PointerEntered -= OnPointerEntered;
+            PointerExited -= OnPointerExited;
+            _loopingStackPanel.DirectManipulationStarted -= LoopingStackPanelOnDirectManipulationStarted;
+            _loopingStackPanel.FocusedItemChanged -= LoopingStackPanelOnFocusedItemChanged;
+            _loopingStackPanel.ItemsPopulated -= LoopingStackPanelOnItemsPopulated;
+            _loopingStackPanel.ResizingStarted -= LoopingStackPanelOnResizingStarted;
+            _loopingStackPanel.ResizingCompleted -= LoopingStackPanelOnResizingCompleted;
+            _loopingStackPanel.ScrollViewChanged -= LoopingStackPanelOnScrollViewChanged;
+            _leftButton.Click -= LeftButtonOnClick;
+            _rightButton.Click -= RightButtonOnClick;
+            _positionMarkers.OnMarkerClicked -= PositionMarkersOnMarkerClicked;
+            if(_timer != null)
+            {
+                _timer.Tick -= AutoRotation_Tick;
+                _timer = null;
+            }
         }
 
         public RCarouselSaveState SaveState()
@@ -409,7 +431,6 @@ namespace Ratio.UWP.Controls
                     break;
             }
         }
-
         #endregion
 
         #region Event Handlers
@@ -579,7 +600,5 @@ namespace Ratio.UWP.Controls
             }
         }
         #endregion
-
-
     }
 }

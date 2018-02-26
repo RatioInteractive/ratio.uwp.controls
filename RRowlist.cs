@@ -189,6 +189,7 @@ namespace Ratio.UWP.Controls
         {
             DefaultStyleKey = typeof(RRowlist);
             Loaded += OnRRowlistLoaded;
+            Unloaded += OnUnloaded;
         }
 
         #region Overrides
@@ -251,6 +252,20 @@ namespace Ratio.UWP.Controls
         #endregion
 
         #region Event Handlers
+        private void OnUnloaded(object o, RoutedEventArgs routedEventArgs)
+        {
+            Loaded -= OnRRowlistLoaded;
+            Unloaded -= OnUnloaded;
+            _leftButton.Click -= LeftButtonOnClick;
+            _rightButton.Click -= RightButtonOnClick;
+            PointerEntered -= RRowlist_PointerEntered;
+            PointerExited -= RRowlist_PointerExited;
+            GotFocus -= RRowlist_GotFocus;
+            LostFocus -= RRowlist_LostFocus;
+            Unwire();
+            ItemsSource = null;
+            DataContext = null;
+        }
 
         private void OnRRowlistLoaded(object sender, RoutedEventArgs routedEventArgs)
         {

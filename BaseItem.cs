@@ -1,14 +1,16 @@
-﻿using System.Diagnostics;
+﻿using System;
 using System.Windows.Input;
 using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 
 namespace Ratio.UWP.Controls
 {
     public class BaseItem :GridViewItem
     {
+        public Binding ItemBinding { get; set; }
         public static readonly DependencyProperty SelectedCommandProperty = DependencyProperty.Register(
             "SelectedCommand", typeof(ICommand), typeof(BaseItem), new PropertyMetadata(default(ICommand)));
 
