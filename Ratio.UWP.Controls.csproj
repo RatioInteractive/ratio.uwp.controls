@@ -109,6 +109,7 @@
     <Compile Include="BaseItem.cs" />
     <Compile Include="CarouselItem.cs" />
     <Compile Include="Extensions\MouseOverCursor.cs" />
+    <Compile Include="IContainerFocusable.cs" />
     <Compile Include="RFilteredWrapGrid.cs" />
     <Compile Include="RCommandPanel.cs" />
     <Compile Include="ControlUtilities.cs" />
