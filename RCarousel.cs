@@ -3,6 +3,7 @@ using System.Collections;
 using System.Diagnostics;
 using Windows.Devices.Input;
 using Windows.System;
+using Windows.System.Profile;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -505,7 +506,7 @@ namespace Ratio.UWP.Controls
         }
         private void PositionMarkersOnMarkerClicked(object sender, object clickedItem)
         {
-            if (DisplayScrollButtons)
+            if(!ControlHelpers.IsXBoxFamily())
                 _loopingStackPanel.JumpToItem(clickedItem);
         }
         private void AutoRotation_Tick(object sender, object e)
