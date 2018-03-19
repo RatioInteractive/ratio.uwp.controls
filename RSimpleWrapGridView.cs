@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
@@ -11,60 +12,79 @@ namespace Ratio.UWP.Controls
     {
         private ItemsWrapGrid _itemsWrapGrid;
         private bool _pendingSizeChange;
-        public static readonly DependencyProperty ItemWidthProperty = DependencyProperty.Register(
-            "ItemWidth", typeof(int), typeof(RSimpleWrapGridView), new PropertyMetadata(default(int), ItemWidthCallback));
 
-        private static void ItemWidthCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        public static readonly DependencyProperty ItemSizeProperty = DependencyProperty.Register(
+            "ItemSize", typeof(Size), typeof(RSimpleWrapGridView), new PropertyMetadata(default(Size)));
+
+        public Size ItemSize
         {
-            if(!(dependencyObject is RSimpleWrapGridView simpleGridView)) return;
-            if(!(simpleGridView.ItemsPanelRoot is ItemsWrapGrid itemsWrapGrid))
-            {
-                simpleGridView._pendingSizeChange = true;
-                return;
-            }
-            try
-            {
-                var itemWidth = (int)dependencyPropertyChangedEventArgs.NewValue;
-                 itemsWrapGrid.ItemWidth = itemWidth;
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                throw;
-            }
-            
+            get => (Size) GetValue(ItemSizeProperty);
+            set => SetValue(ItemSizeProperty, value);
         }
 
-        public int ItemWidth
+        public static readonly DependencyProperty ItemPaddingProperty = DependencyProperty.Register(
+            "ItemPadding", typeof(Thickness), typeof(RSimpleWrapGridView), new PropertyMetadata(default(Thickness)));
+
+        public Thickness ItemPadding
         {
-            get => (int) GetValue(ItemWidthProperty);
-            set => SetValue(ItemWidthProperty, value);
+            get => (Thickness) GetValue(ItemPaddingProperty);
+            set => SetValue(ItemPaddingProperty, value);
         }
 
-        public static readonly DependencyProperty ItemHeightProperty = DependencyProperty.Register(
-            "ItemHeight", typeof(int), typeof(RSimpleWrapGridView), new PropertyMetadata(default(int),ItemHeightCallback));
+//        public static readonly DependencyProperty ItemWidthProperty = DependencyProperty.Register(
+//            "ItemWidth", typeof(int), typeof(RSimpleWrapGridView), new PropertyMetadata(default(int), ItemWidthCallback));
+//
+//        private static void ItemWidthCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+//        {
+//            if(!(dependencyObject is RSimpleWrapGridView simpleGridView)) return;
+//            if(!(simpleGridView.ItemsPanelRoot is ItemsWrapGrid itemsWrapGrid))
+//            {
+//                simpleGridView._pendingSizeChange = true;
+//                return;
+//            }
+//            try
+//            {
+//                var itemWidth = (int)dependencyPropertyChangedEventArgs.NewValue;
+//                 itemsWrapGrid.ItemWidth = itemWidth;
+//            }
+//            catch (Exception e)
+//            {
+//                Debug.WriteLine(e.Message);
+//                throw;
+//            }
+//            
+//        }
 
-        private static void ItemHeightCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
-        {
-            if (!(dependencyObject is RSimpleWrapGridView simpleGridView)) return;
-            if (!(simpleGridView.ItemsPanelRoot is ItemsWrapGrid itemsWrapGrid))
-            {
-                simpleGridView._pendingSizeChange = true;
-                return;
-            }
-            try
-            {                
-                var itemHeight = (int)dependencyPropertyChangedEventArgs.NewValue;
-                itemsWrapGrid.ItemHeight = itemHeight;
-
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                throw;
-            }
-
-        }
+//        public int ItemWidth
+//        {
+//            get => (int) GetValue(ItemWidthProperty);
+//            set => SetValue(ItemWidthProperty, value);
+//        }
+//
+//        public static readonly DependencyProperty ItemHeightProperty = DependencyProperty.Register(
+//            "ItemHeight", typeof(int), typeof(RSimpleWrapGridView), new PropertyMetadata(default(int),ItemHeightCallback));
+//
+//        private static void ItemHeightCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+//        {
+//            if (!(dependencyObject is RSimpleWrapGridView simpleGridView)) return;
+//            if (!(simpleGridView.ItemsPanelRoot is ItemsWrapGrid itemsWrapGrid))
+//            {
+//                simpleGridView._pendingSizeChange = true;
+//                return;
+//            }
+//            try
+//            {                
+//                var itemHeight = (int)dependencyPropertyChangedEventArgs.NewValue;
+//                itemsWrapGrid.ItemHeight = itemHeight;
+//
+//            }
+//            catch (Exception e)
+//            {
+//                Debug.WriteLine(e.Message);
+//                throw;
+//            }
+//
+//        }
 
         private static void SimpleGridViewOnLoaded(object sender, RoutedEventArgs routedEventArgs)
         {
@@ -78,11 +98,11 @@ namespace Ratio.UWP.Controls
             SetColumn(simpleGridView,simpleGridView.SingleColumn);
         }
 
-        public int ItemHeight
-        {
-            get => (int) GetValue(ItemHeightProperty);
-            set => SetValue(ItemHeightProperty, value);
-        }
+//        public int ItemHeight
+//        {
+//            get => (int) GetValue(ItemHeightProperty);
+//            set => SetValue(ItemHeightProperty, value);
+//        }
 
         public static readonly DependencyProperty SingleColumnProperty = DependencyProperty.Register(
             "SingleColumn", typeof(bool), typeof(RSimpleWrapGridView), new PropertyMetadata(default(bool),SingleColumnCallback));
@@ -150,6 +170,13 @@ namespace Ratio.UWP.Controls
                     };
                     simpleWrapGridItem.ItemBinding = binding;
                     simpleWrapGridItem.SetBinding(BaseItem.SelectedCommandProperty, binding);
+
+                    var sizeBinding = new Binding()
+                    {
+                        Path = new PropertyPath("ItemSize"),
+                        Source = this
+                    };
+                    simpleWrapGridItem.SetBinding(BaseItem.SpecifiedSizeProperty, sizeBinding);
                 }
                 simpleWrapGridItem.SourceItem = item;
 
@@ -159,7 +186,6 @@ namespace Ratio.UWP.Controls
 
         private static bool SetColumn(RSimpleWrapGridView simpleGridView, bool singleColumn = false)
         {
-            Debug.WriteLine("Set column called. ItemsPanel: {0}",simpleGridView.ItemsPanelRoot);
             if (simpleGridView._itemsWrapGrid == null)
             {
                 simpleGridView._itemsWrapGrid = simpleGridView.ItemsPanelRoot as ItemsWrapGrid;
@@ -168,8 +194,8 @@ namespace Ratio.UWP.Controls
             if (singleColumn)
             {
                 simpleGridView._itemsWrapGrid.MaximumRowsOrColumns = 1;
-                simpleGridView.ClearValue(ItemWidthProperty);
-                simpleGridView.ClearValue(ItemHeightProperty);
+//                simpleGridView.ClearValue(ItemWidthProperty);
+//                simpleGridView.ClearValue(ItemHeightProperty);
                 simpleGridView._itemsWrapGrid.ClearValue(ItemsWrapGrid.ItemWidthProperty);                
                 simpleGridView._itemsWrapGrid.ClearValue(ItemsWrapGrid.ItemHeightProperty);
 //                Debug.WriteLine("COL: Simple grid: ItemHeight: {0}, ItemWidth: {1}, Panel ItemHeight: {2}, ItemWidth: {3}",simpleGridView.ItemHeight,simpleGridView.ItemWidth,simpleGridView._itemsWrapGrid.ItemHeight,simpleGridView._itemsWrapGrid.ItemWidth);
@@ -177,8 +203,8 @@ namespace Ratio.UWP.Controls
             else
             {
                 simpleGridView._itemsWrapGrid.ClearValue(ItemsWrapGrid.MaximumRowsOrColumnsProperty);
-                simpleGridView._itemsWrapGrid.ItemHeight = simpleGridView.ItemHeight;
-                simpleGridView._itemsWrapGrid.ItemWidth = simpleGridView.ItemWidth;
+                simpleGridView._itemsWrapGrid.ItemHeight = simpleGridView.ItemSize.Height + simpleGridView.ItemPadding.Top + simpleGridView.ItemPadding.Bottom;
+                simpleGridView._itemsWrapGrid.ItemWidth = simpleGridView.ItemSize.Width + simpleGridView.ItemPadding.Left + simpleGridView.ItemPadding.Right;
 //                Debug.WriteLine("SIZE: Simple grid: ItemHeight: {0}, ItemWidth: {1}, Panel ItemHeight: {2}, ItemWidth: {3}", simpleGridView.ItemHeight, simpleGridView.ItemWidth, simpleGridView._itemsWrapGrid.ItemHeight, simpleGridView._itemsWrapGrid.ItemWidth);
             }
             return true;

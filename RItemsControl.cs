@@ -3,9 +3,12 @@ using System.Collections;
 using System.Diagnostics;
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography;
+using Windows.ApplicationModel;
 using Windows.Foundation;
+using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
 
 namespace Ratio.UWP.Controls
@@ -84,7 +87,7 @@ namespace Ratio.UWP.Controls
         {
             if (!(dependencyPropertyChangedEventArgs.NewValue is Size size)) return;
             if (!(dependencyObject is RItemsControl itemsControl)) return;
-            SetSubRowlistItemsSize(itemsControl, size);         
+//            SetSubRowlistItemsSize(itemsControl, size);         
         }
 
         private static void SetSubRowlistItemsSize(RItemsControl itemsControl, Size size)
@@ -142,6 +145,8 @@ namespace Ratio.UWP.Controls
         public RItemsControl()
         {
             DefaultStyleKey = typeof(RItemsControl);
+
+
         }
 
         protected override void OnApplyTemplate()
@@ -159,9 +164,33 @@ namespace Ratio.UWP.Controls
             OnItemsCompleted();
         }
 
+        protected override DependencyObject GetContainerForItemOverride()
+        {
+            return new RRowlistContainer();
+        }
+
+        protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
+        {
+            base.PrepareContainerForItemOverride(element, item);
+            if (element is RRowlistContainer rowlistContainer)
+            {
+                BindRowlist(rowlistContainer);
+            }
+        }
+
+        private void BindRowlist(RRowlistContainer rowlistContainer)
+        {
+            var sizeBinding = new Binding()
+            {
+                Path = new PropertyPath("SubItemSize"),
+                Source = this
+            };
+            rowlistContainer.SetBinding(RRowlistContainer.ItemSizeProperty, sizeBinding);
+        }
+
         private void OnItemsCompleted()
         {
-            SetSubRowlistItemsSize(this,SubItemSize);
+//            SetSubRowlistItemsSize(this,SubItemSize);
             SetSubRowlistItemTemplate(this,SubItemTemplate);
             SetScrollButtonSize(this,ScrollButtonSize);
             SetShiftSteps(this,ShiftSteps);

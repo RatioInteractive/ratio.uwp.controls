@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using System.Windows.Input;
 using Windows.Devices.Input;
+using Windows.Foundation;
 using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -22,6 +23,15 @@ namespace Ratio.UWP.Controls
         #region Dependency Properties
 
         #region Dimensions
+
+        public static readonly DependencyProperty ItemSizeProperty = DependencyProperty.Register(
+            "ItemSize", typeof(Size), typeof(RRowlist), new PropertyMetadata(default(Size)));
+
+        public Size ItemSize
+        {
+            get => (Size) GetValue(ItemSizeProperty);
+            set => SetValue(ItemSizeProperty, value);
+        }
         public static readonly DependencyProperty ItemWidthProperty = DependencyProperty.Register(
             "ItemWidth", typeof(double), typeof(RRowlist), new PropertyMetadata(default(double),ItemWidthChanged));
 
@@ -29,7 +39,7 @@ namespace Ratio.UWP.Controls
         {
             var rowlist = dependencyObject as RRowlist;
             if(rowlist?._rowlistWrapGrid == null) return;
-            rowlist._rowlistWrapGrid.ItemWidth = (double)dependencyPropertyChangedEventArgs.NewValue;
+//            rowlist._rowlistWrapGrid.ItemWidth = (double)dependencyPropertyChangedEventArgs.NewValue;
         }
 
         public static readonly DependencyProperty ItemHeightProperty = DependencyProperty.Register(
@@ -39,7 +49,7 @@ namespace Ratio.UWP.Controls
         {
             var rowlist = dependencyObject as RRowlist;
             if (rowlist?._rowlistWrapGrid == null) return;
-            rowlist._rowlistWrapGrid.ItemHeight = (double)dependencyPropertyChangedEventArgs.NewValue;
+//            rowlist._rowlistWrapGrid.ItemHeight = (double)dependencyPropertyChangedEventArgs.NewValue;
         }
 
         public static readonly DependencyProperty ScrollButtonWidthProperty = DependencyProperty.Register(
@@ -240,6 +250,12 @@ namespace Ratio.UWP.Controls
                         Source = item
                     };
                     rowlistItem.SetBinding(BaseItem.SelectedCommandProperty, binding);
+                    var sizeBinding = new Binding()
+                    {
+                        Path = new PropertyPath("ItemSize"),
+                        Source = this
+                    };
+                    rowlistItem.SetBinding(BaseItem.SpecifiedSizeProperty, sizeBinding);
                 }
                 rowlistItem.SourceItem = item;
 
