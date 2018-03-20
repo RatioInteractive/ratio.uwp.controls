@@ -24,5 +24,32 @@ namespace Ratio.UWP.Controls
             get => (Size) GetValue(ItemSizeProperty);
             set => SetValue(ItemSizeProperty, value);
         }
+
+        public static readonly DependencyProperty ItemTemplateProperty = DependencyProperty.Register(
+            "ItemTemplate", typeof(DataTemplate), typeof(RRowlistContainer), new PropertyMetadata(default(DataTemplate)));
+
+        public DataTemplate ItemTemplate
+        {
+            get => (DataTemplate) GetValue(ItemTemplateProperty);
+            set => SetValue(ItemTemplateProperty, value);
+        }
+
+        public static readonly DependencyProperty ShiftStepsProperty = DependencyProperty.Register(
+            "ShiftSteps", typeof(int), typeof(RRowlistContainer), new PropertyMetadata(default(int)));
+
+        public int ShiftSteps
+        {
+            get => (int) GetValue(ShiftStepsProperty);
+            set => SetValue(ShiftStepsProperty, value);
+        }
+
+        public static readonly DependencyProperty ScrollButtonSizeProperty = DependencyProperty.Register(
+            "ScrollButtonSize", typeof(Size), typeof(RRowlistContainer), new PropertyMetadata(default(Size)));
+
+        public Size ScrollButtonSize
+        {
+            get => (Size) GetValue(ScrollButtonSizeProperty);
+            set => SetValue(ScrollButtonSizeProperty, value);
+        }
     }
 }

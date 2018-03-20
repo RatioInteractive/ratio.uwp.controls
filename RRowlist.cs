@@ -70,6 +70,23 @@ namespace Ratio.UWP.Controls
             set => SetValue(ScrollButtonHeightProperty, value);
         }
 
+        public static readonly DependencyProperty ScrollButtonSizeProperty = DependencyProperty.Register(
+            "ScrollButtonSize", typeof(Size), typeof(RRowlist), new PropertyMetadata(default(Size),ScrollButtonSizePropertyChangedCallback));
+
+        private static void ScrollButtonSizePropertyChangedCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        {
+            var rowlist = dependencyObject as RRowlist;
+            if(rowlist == null) return;
+            rowlist.ScrollButtonHeight = ((Size) dependencyPropertyChangedEventArgs.NewValue).Height;
+            rowlist.ScrollButtonWidth = ((Size) dependencyPropertyChangedEventArgs.NewValue).Width;
+        }
+
+        public Size ScrollButtonSize
+        {
+            get => (Size) GetValue(ScrollButtonSizeProperty);
+            set => SetValue(ScrollButtonSizeProperty, value);
+        }
+
         public static readonly DependencyProperty LabelContainerHeightProperty = DependencyProperty.Register(
             "LabelContainerHeight", typeof(GridLength), typeof(RRowlist), new PropertyMetadata(new GridLength(60,GridUnitType.Pixel)));
 
@@ -288,8 +305,8 @@ namespace Ratio.UWP.Controls
             _rowlistWrapGrid = ItemsPanelRoot as ItemsWrapGrid;
             if (_rowlistWrapGrid != null)
             {
-                _rowlistWrapGrid.ItemHeight = ItemHeight;
-                _rowlistWrapGrid.ItemWidth = ItemWidth;
+                _rowlistWrapGrid.ItemHeight = ItemSize.Height;
+                _rowlistWrapGrid.ItemWidth = ItemSize.Width;
             }
             LayoutUpdated += OnLayoutUpdated;
         }
@@ -332,17 +349,17 @@ namespace Ratio.UWP.Controls
 
         private void RightButtonOnClick(object sender, RoutedEventArgs routedEventArgs)
         {
-            if (double.IsNaN(ItemWidth)) return;
+            if (double.IsNaN(ItemSize.Width)) return;
             var currentOffset = _scrollViewer.HorizontalOffset;
-            var changedOffset = currentOffset + (ShiftSteps > 0 ? ShiftSteps * ItemWidth : ItemWidth);
+            var changedOffset = currentOffset + (ShiftSteps > 0 ? ShiftSteps * ItemSize.Width : ItemSize.Width);
             _scrollViewer.ChangeView(changedOffset, 0, 1, false);
         }
 
         private void LeftButtonOnClick(object sender, RoutedEventArgs routedEventArgs)
         {
-            if (double.IsNaN(ItemWidth)) return;
+            if (double.IsNaN(ItemSize.Width)) return;
             var currentOffset = _scrollViewer.HorizontalOffset;
-            var changedOffset = currentOffset - (ShiftSteps > 0 ? ShiftSteps * ItemWidth : ItemWidth);
+            var changedOffset = currentOffset - (ShiftSteps > 0 ? ShiftSteps * ItemSize.Width : ItemSize.Width);
             _scrollViewer.ChangeView(changedOffset > 0 ? changedOffset : 0, 0, 1, false);
         }
 

@@ -21,16 +21,16 @@ namespace Ratio.UWP.Controls
         private static void ShiftStepsChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
         {
             if (!(dependencyObject is RItemsControl itemsControl)) return;
-            try
-            {
-                var steps = (int) dependencyPropertyChangedEventArgs.NewValue;
-                SetShiftSteps(itemsControl,steps);
-            }
-            catch (InvalidCastException exception)
-            {
-                Debug.WriteLine(exception);
-                throw;
-            }
+//            try
+//            {
+//                var steps = (int) dependencyPropertyChangedEventArgs.NewValue;
+//                SetShiftSteps(itemsControl,steps);
+//            }
+//            catch (InvalidCastException exception)
+//            {
+//                Debug.WriteLine(exception);
+//                throw;
+//            }
         }
 
         private static void SetShiftSteps(ItemsControl itemsControl, int steps)
@@ -58,7 +58,7 @@ namespace Ratio.UWP.Controls
         {
             if(!(dependencyObject is RItemsControl itemsControl)) return;
             if(!(dependencyPropertyChangedEventArgs.NewValue is DataTemplate dataTemplate)) return;
-            SetSubRowlistItemTemplate(itemsControl,dataTemplate);
+            //SetSubRowlistItemTemplate(itemsControl,dataTemplate);
         }
 
         private static void SetSubRowlistItemTemplate(RItemsControl itemsControl, DataTemplate dataTemplate)
@@ -87,12 +87,14 @@ namespace Ratio.UWP.Controls
         {
             if (!(dependencyPropertyChangedEventArgs.NewValue is Size size)) return;
             if (!(dependencyObject is RItemsControl itemsControl)) return;
+
 //            SetSubRowlistItemsSize(itemsControl, size);         
         }
 
         private static void SetSubRowlistItemsSize(RItemsControl itemsControl, Size size)
         {
             if (itemsControl.Items == null) return;
+            
             for (int i = 0; i < itemsControl.Items?.Count; i++)
             {
                 var container = itemsControl.ContainerFromIndex(i);
@@ -117,7 +119,7 @@ namespace Ratio.UWP.Controls
         {
             if (!(dependencyPropertyChangedEventArgs.NewValue is Size size)) return;
             if (!(dependencyObject is RItemsControl itemsControl)) return;
-            SetScrollButtonSize(itemsControl, size);
+            //SetScrollButtonSize(itemsControl, size);
         }
 
         private static void SetScrollButtonSize(ItemsControl itemsControl, Size size)
@@ -129,8 +131,7 @@ namespace Ratio.UWP.Controls
                 if(container == null) continue;
                 var rowlist = VisualTreeHelper.GetChild(container, 0) as RRowlist;
                 if (rowlist == null) continue;
-                rowlist.ScrollButtonHeight = size.Height;
-                rowlist.ScrollButtonWidth = size.Width;
+                rowlist.ScrollButtonSize = size;
             }
         }
 
@@ -186,14 +187,34 @@ namespace Ratio.UWP.Controls
                 Source = this
             };
             rowlistContainer.SetBinding(RRowlistContainer.ItemSizeProperty, sizeBinding);
+            var itemTemplateBinding = new Binding()
+            {
+                Path = new PropertyPath("SubItemTemplate"),
+                Source = this
+            };
+            rowlistContainer.SetBinding(RRowlistContainer.ItemTemplateProperty, itemTemplateBinding);
+
+            var shiftStepsBinding = new Binding()
+            {
+                Path = new PropertyPath("ShiftSteps"),
+                Source = this
+            };
+            rowlistContainer.SetBinding(RRowlistContainer.ShiftStepsProperty, shiftStepsBinding);
+
+            var buttonSizeBinding = new Binding()
+            {
+                Path = new PropertyPath("ScrollButtonSize"),
+                Source = this
+            };
+            rowlistContainer.SetBinding(RRowlistContainer.ScrollButtonSizeProperty, buttonSizeBinding);
         }
 
         private void OnItemsCompleted()
         {
 //            SetSubRowlistItemsSize(this,SubItemSize);
-            SetSubRowlistItemTemplate(this,SubItemTemplate);
-            SetScrollButtonSize(this,ScrollButtonSize);
-            SetShiftSteps(this,ShiftSteps);
+//            SetSubRowlistItemTemplate(this,SubItemTemplate);
+//            SetScrollButtonSize(this,ScrollButtonSize);
+//            SetShiftSteps(this,ShiftSteps);
             ItemsCompleted?.Invoke(this, EventArgs.Empty);
         }
     }

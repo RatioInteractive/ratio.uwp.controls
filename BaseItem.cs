@@ -96,18 +96,5 @@ namespace Ratio.UWP.Controls
             _listViewItemPresenter = GetTemplateChild("listViewItemPresenter") as ListViewItemPresenter;
             base.OnApplyTemplate();
         }
-
-//        protected override Size MeasureOverride(Size availableSize)
-//        {
-//            if (!double.IsInfinity(availableSize.Height))
-//            {
-//                Debug.WriteLine($"availibleSize: {availableSize}, Speced Size: {SpecifiedSize}");
-//                if (SpecifiedSize.Width > 0 && Math.Abs(SpecifiedSize.Width - availableSize.Width) < 2.0f)
-//                {
-//                    return SpecifiedSize;
-//                }
-//            }
-//            return base.MeasureOverride(availableSize);
-//        }
     }
 }
