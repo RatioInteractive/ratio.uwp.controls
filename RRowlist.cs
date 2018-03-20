@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using System.Windows.Input;
 using Windows.Devices.Input;
+using Windows.Foundation;
 using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -22,6 +23,15 @@ namespace Ratio.UWP.Controls
         #region Dependency Properties
 
         #region Dimensions
+
+        public static readonly DependencyProperty ItemSizeProperty = DependencyProperty.Register(
+            "ItemSize", typeof(Size), typeof(RRowlist), new PropertyMetadata(default(Size)));
+
+        public Size ItemSize
+        {
+            get => (Size) GetValue(ItemSizeProperty);
+            set => SetValue(ItemSizeProperty, value);
+        }
         public static readonly DependencyProperty ItemWidthProperty = DependencyProperty.Register(
             "ItemWidth", typeof(double), typeof(RRowlist), new PropertyMetadata(default(double),ItemWidthChanged));
 
@@ -29,7 +39,7 @@ namespace Ratio.UWP.Controls
         {
             var rowlist = dependencyObject as RRowlist;
             if(rowlist?._rowlistWrapGrid == null) return;
-            rowlist._rowlistWrapGrid.ItemWidth = (double)dependencyPropertyChangedEventArgs.NewValue;
+//            rowlist._rowlistWrapGrid.ItemWidth = (double)dependencyPropertyChangedEventArgs.NewValue;
         }
 
         public static readonly DependencyProperty ItemHeightProperty = DependencyProperty.Register(
@@ -39,7 +49,7 @@ namespace Ratio.UWP.Controls
         {
             var rowlist = dependencyObject as RRowlist;
             if (rowlist?._rowlistWrapGrid == null) return;
-            rowlist._rowlistWrapGrid.ItemHeight = (double)dependencyPropertyChangedEventArgs.NewValue;
+//            rowlist._rowlistWrapGrid.ItemHeight = (double)dependencyPropertyChangedEventArgs.NewValue;
         }
 
         public static readonly DependencyProperty ScrollButtonWidthProperty = DependencyProperty.Register(
@@ -58,6 +68,23 @@ namespace Ratio.UWP.Controls
         {
             get => (double) GetValue(ScrollButtonHeightProperty);
             set => SetValue(ScrollButtonHeightProperty, value);
+        }
+
+        public static readonly DependencyProperty ScrollButtonSizeProperty = DependencyProperty.Register(
+            "ScrollButtonSize", typeof(Size), typeof(RRowlist), new PropertyMetadata(default(Size),ScrollButtonSizePropertyChangedCallback));
+
+        private static void ScrollButtonSizePropertyChangedCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        {
+            var rowlist = dependencyObject as RRowlist;
+            if(rowlist == null) return;
+            rowlist.ScrollButtonHeight = ((Size) dependencyPropertyChangedEventArgs.NewValue).Height;
+            rowlist.ScrollButtonWidth = ((Size) dependencyPropertyChangedEventArgs.NewValue).Width;
+        }
+
+        public Size ScrollButtonSize
+        {
+            get => (Size) GetValue(ScrollButtonSizeProperty);
+            set => SetValue(ScrollButtonSizeProperty, value);
         }
 
         public static readonly DependencyProperty LabelContainerHeightProperty = DependencyProperty.Register(
@@ -240,6 +267,12 @@ namespace Ratio.UWP.Controls
                         Source = item
                     };
                     rowlistItem.SetBinding(BaseItem.SelectedCommandProperty, binding);
+                    var sizeBinding = new Binding()
+                    {
+                        Path = new PropertyPath("ItemSize"),
+                        Source = this
+                    };
+                    rowlistItem.SetBinding(BaseItem.SpecifiedSizeProperty, sizeBinding);
                 }
                 rowlistItem.SourceItem = item;
 
@@ -272,8 +305,8 @@ namespace Ratio.UWP.Controls
             _rowlistWrapGrid = ItemsPanelRoot as ItemsWrapGrid;
             if (_rowlistWrapGrid != null)
             {
-                _rowlistWrapGrid.ItemHeight = ItemHeight;
-                _rowlistWrapGrid.ItemWidth = ItemWidth;
+                _rowlistWrapGrid.ItemHeight = ItemSize.Height;
+                _rowlistWrapGrid.ItemWidth = ItemSize.Width;
             }
             LayoutUpdated += OnLayoutUpdated;
         }
@@ -316,17 +349,17 @@ namespace Ratio.UWP.Controls
 
         private void RightButtonOnClick(object sender, RoutedEventArgs routedEventArgs)
         {
-            if (double.IsNaN(ItemWidth)) return;
+            if (double.IsNaN(ItemSize.Width)) return;
             var currentOffset = _scrollViewer.HorizontalOffset;
-            var changedOffset = currentOffset + (ShiftSteps > 0 ? ShiftSteps * ItemWidth : ItemWidth);
+            var changedOffset = currentOffset + (ShiftSteps > 0 ? ShiftSteps * ItemSize.Width : ItemSize.Width);
             _scrollViewer.ChangeView(changedOffset, 0, 1, false);
         }
 
         private void LeftButtonOnClick(object sender, RoutedEventArgs routedEventArgs)
         {
-            if (double.IsNaN(ItemWidth)) return;
+            if (double.IsNaN(ItemSize.Width)) return;
             var currentOffset = _scrollViewer.HorizontalOffset;
-            var changedOffset = currentOffset - (ShiftSteps > 0 ? ShiftSteps * ItemWidth : ItemWidth);
+            var changedOffset = currentOffset - (ShiftSteps > 0 ? ShiftSteps * ItemSize.Width : ItemSize.Width);
             _scrollViewer.ChangeView(changedOffset > 0 ? changedOffset : 0, 0, 1, false);
         }
 

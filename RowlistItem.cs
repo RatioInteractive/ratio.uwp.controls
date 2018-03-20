@@ -1,4 +1,8 @@
-﻿namespace Ratio.UWP.Controls
+﻿using System.Diagnostics;
+using Windows.ApplicationModel;
+using Windows.Foundation;
+
+namespace Ratio.UWP.Controls
 {
     public sealed class RowlistItem : BaseItem
     {

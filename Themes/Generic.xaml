@@ -236,7 +236,7 @@
                 <ControlTemplate TargetType="controls:RCarousel">
                     <Grid x:Name="rootGrid" ScrollViewer.VerticalScrollBarVisibility="Disabled">
                         <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroup x:Name="LeftRightButtonStates">
+                            <VisualStateGroup x:Name="LeftRightButtonStatesCarGen">
                                 <VisualState x:Name="ButtonsHidden">
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="leftButton" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.3"/>
@@ -515,7 +515,7 @@
                 <ControlTemplate TargetType="controls:RRowlist">
                     <Grid BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}">
                         <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroup x:Name="LeftRightButtonStates">
+                            <VisualStateGroup x:Name="LeftRightButtonStatesRLTGen">
                                 <VisualState x:Name="ButtonsHidden">
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="leftButton" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.3"/>

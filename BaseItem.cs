@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows.Input;
+using Windows.ApplicationModel;
+using Windows.Foundation;
 using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -24,12 +27,23 @@ namespace Ratio.UWP.Controls
             get => (ICommand)GetValue(SelectedCommandProperty);
             set => SetValue(SelectedCommandProperty, value);
         }
+
+        public static readonly DependencyProperty SpecifiedSizeProperty = DependencyProperty.Register(
+            "SpecifiedSize", typeof(Size), typeof(BaseItem), new PropertyMetadata(default(Size)));
+
+        public Size SpecifiedSize
+        {
+            get => (Size) GetValue(SpecifiedSizeProperty);
+            set => SetValue(SpecifiedSizeProperty, value);
+        }
+
         public object SourceItem { get; set; }
 
         private IContainerFocusable Focusable
         {
             get
             {
+                if (DesignMode.DesignModeEnabled) return null;
                 if (_focusable != null) return _focusable;
                 if (_listViewItemPresenter == null) return null;
                 if (!(VisualTreeHelper.GetChild(_listViewItemPresenter,0) is IContainerFocusable child)) return null;
@@ -53,7 +67,7 @@ namespace Ratio.UWP.Controls
 
         protected override void OnKeyUp(KeyRoutedEventArgs e)
         {
-//            Debug.WriteLine($"Key captured by item control. Key: {e.OriginalKey}");
+            Debug.WriteLine($"Key captured by item control. Key: {e.OriginalKey}");
             if ((e.OriginalKey == VirtualKey.GamepadA || e.Key == VirtualKey.Space || e.Key == VirtualKey.Enter) && SelectedCommand != null)
             {
                 if (SelectedCommand.CanExecute(SourceItem))
