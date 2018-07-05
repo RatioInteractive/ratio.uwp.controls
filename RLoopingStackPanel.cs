@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Windows.ApplicationModel;
 using Windows.System;
 using Windows.System.Profile;
 using Windows.UI.Core;
@@ -201,6 +202,7 @@ namespace Ratio.UWP.Controls
         #region Public methods
         public RLoopingStackPanel()
         {
+            if(DesignMode.DesignModeEnabled) return;
             DefaultStyleKey = typeof(RLoopingStackPanel);            
             Loaded += (sender, args) => LayoutUpdated += OnLayoutUpdated;
             Unloaded += OnUnloaded;
