@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Diagnostics;
+using Windows.ApplicationModel;
 using Windows.Devices.Input;
 using Windows.System;
 using Windows.System.Profile;
@@ -265,6 +266,7 @@ namespace Ratio.UWP.Controls
         #region Public Methods
         public RCarousel()
         {
+            if(DesignMode.DesignModeEnabled) return;
             TabFocusNavigation = KeyboardNavigationMode.Once;
             DefaultStyleKey = typeof(RCarousel);
             Unloaded += OnUnloaded;
